@@ -1,0 +1,1377 @@
+import pandas as pd
+import numpy as np
+import streamlit as st
+import sqlite3
+from datetime import datetime as dt
+import hashlib
+from google import genai
+
+# ========= INTEGRASI GEMINI
+### ======= KONFIGURASI AI
+try:
+    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+except Exception as e:
+    st.error(f"Konfigurasi AI gagal: {e}")
+    client = None
+
+### ======= FUNGSI ANALISIS AI
+def get_ai_analysis(data_anak, status_z):
+    prompt = f"""
+    Anda adalah Pakar Gizi Anak (Pediatrician) Berstandar WHO. Berikan analisis mendalam berdasarkan data:
+    - Nama: {data_anak['name']}
+    - Usia: {data_anak['age']} bulan ({data_anak['sex']})
+    - Skor Weight for Age: {status_z['waz_z']} ({status_z['waz_label']})
+    - Skor Height for Age: {status_z['haz_z']} ({status_z['haz_label']})
+    - Skor Weight for Height: {status_z['whz_z']} ({status_z['whz_label']})
+    - Skor Head Circum for Age: {status_z['hcz_z']} ({status_z['hcz_label']})
+    
+        Anda adalah asisten pendukung skrining pertumbuhan anak di tingkat Posyandu.
+    Peran Anda terbatas pada interpretasi hasil skrining antropometri berdasarkan standar WHO
+    dan pemberian saran tindak lanjut awal yang bersifat edukatif dan non-medis.
+
+    Anda bukan tenaga kesehatan dan tidak melakukan diagnosis stunting atau penyakit.
+    Anda tidak memberikan rekomendasi pengobatan atau terapi medis
+    Batasan tugas Anda:
+    - Hanya menjelaskan makna hasil skrining pertumbuhan anak
+    - Memberikan saran tindak lanjut awal yang bersifat umum dan non-medis
+    - Mengarahkan kader untuk merujuk ke tenaga kesehatan bila ditemukan risiko
+
+    Dilarang:
+    - Menyatakan diagnosis stunting atau penyakit
+    - Memberikan rekomendasi pengobatan, suplemen, atau terapi medis
+    - Menggantikan peran tenaga kesehatan profesional
+    Menyusun interpretasi hasil skrining secara ringkas, jelas, dan mudah dipahami kader
+    2. Menjelaskan arti kombinasi indikator antropometri tersebut terhadap risiko pertumbuhan anak
+    3. Menyampaikan hasil dalam bahasa non-teknis dan tidak menakutkan
+    4. Menyusun saran tindak lanjut awal yang dapat dilakukan kader Posyandu
+    ormat keluaran WAJIB sebagai berikut:
+
+    1. Ringkasan Hasil Skrining
+    (jelaskan kondisi pertumbuhan anak secara umum)
+
+    2. Interpretasi Risiko
+    (jelaskan apakah anak perlu pemantauan rutin, perhatian khusus, atau rujukan)
+
+    3. Saran Tindak Lanjut Awal untuk Kader
+    (berupa langkah umum seperti pemantauan ulang, edukasi orang tua, rujukan)
+
+    4. Catatan Penting
+    (tegaskan bahwa hasil ini bukan diagnosis dan perlu konfirmasi tenaga kesehatan)
+"""
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        return response.text
+    except Exception as e:
+        return f"Oops. Gagal mendapatkan saran Gemini: {str(e)}"
+
+# ========= DATABASE SETUP
+def init_database():
+    conn = sqlite3.connect('.secret/krenova_data.db')
+    c = conn.cursor()
+    
+    # Tabel Users
+    c.execute('''CREATE TABLE IF NOT EXISTS users
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  username TEXT UNIQUE NOT NULL,
+                  password TEXT NOT NULL,
+                  role TEXT NOT NULL,
+                  nama_lengkap TEXT)''')
+    
+    # Tabel Measurements
+    c.execute('''CREATE TABLE IF NOT EXISTS measurements
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  tanggal_pengukuran DATE,
+                  nama_anak TEXT,
+                  usia_bulan INTEGER,
+                  gender TEXT,
+                  alamat TEXT,
+                  berat_badan REAL,
+                  tinggi_badan REAL,
+                  lingkar_kepala REAL,
+                  wfa_zscore REAL,
+                  wfa_status TEXT,
+                  hfa_zscore REAL,
+                  hfa_status TEXT,
+                  wfh_zscore REAL,
+                  wfh_status TEXT,
+                  hcfa_zscore REAL,
+                  hcfa_status TEXT,
+                  risiko_stunting_persen INTEGER,
+                  status_stunting TEXT,
+                  created_by TEXT,
+                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+    
+    # Insert default admin jika belum ada
+    c.execute("SELECT * FROM users WHERE username='tumbuh'")
+    if not c.fetchone():
+        admin_pass = hashlib.sha256('12345'.encode()).hexdigest()
+        c.execute("INSERT INTO users (username, password, role, nama_lengkap) VALUES (?, ?, ?, ?)",
+                  ('tumbuh', admin_pass, 'admin', 'Administrator'))
+    
+    # Insert default user jika belum ada
+    c.execute("SELECT * FROM users WHERE username='user'")
+    if not c.fetchone():
+        user_pass = hashlib.sha256('user123'.encode()).hexdigest()
+        c.execute("INSERT INTO users (username, password, role, nama_lengkap) VALUES (?, ?, ?, ?)",
+                  ('user', user_pass, 'user', 'User Biasa'))
+    
+    conn.commit()
+    conn.close()
+
+# ========= AUTHENTICATION FUNCTIONS
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_login(username, password):
+    conn = sqlite3.connect('.secret/krenova_data.db')
+    c = conn.cursor()
+    hashed_pw = hash_password(password)
+    c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, hashed_pw))
+    user = c.fetchone()
+    conn.close()
+    return user
+
+def save_measurement(data, z_scores, statuses, risk, status_stunting, username):
+    conn = sqlite3.connect('.secret/krenova_data.db')
+    c = conn.cursor()
+    c.execute('''INSERT INTO measurements 
+                 (tanggal_pengukuran, nama_anak, usia_bulan, gender, alamat, berat_badan, tinggi_badan, 
+                  lingkar_kepala, wfa_zscore, wfa_status, hfa_zscore, hfa_status, wfh_zscore, 
+                  wfh_status, hcfa_zscore, hcfa_status, risiko_stunting_persen, status_stunting, created_by)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+              (data['date'], data['name'], data['age'], data['sex'], data['alamat'], data['weight'], data['height'],
+               data['hc'], z_scores['wfa'], statuses['wfa'], z_scores['hfa'], statuses['hfa'],
+               z_scores['wfh'], statuses['wfh'], z_scores['hcfa'], statuses['hcfa'],
+               risk, status_stunting, username))
+    conn.commit()
+    conn.close()
+
+def get_all_measurements():
+    conn = sqlite3.connect('.secret/krenova_data.db')
+    df = pd.read_sql_query("SELECT * FROM measurements ORDER BY created_at DESC", conn)
+    conn.close()
+    return df
+
+def update_measurement(record_id, data, z_scores, statuses, risk, status_stunting):
+    conn = sqlite3.connect('.secret/krenova_data.db')
+    c = conn.cursor()
+    c.execute('''UPDATE measurements 
+                 SET tanggal_pengukuran=?, nama_anak=?, usia_bulan=?, gender=?, alamat=?, 
+                     berat_badan=?, tinggi_badan=?, lingkar_kepala=?,
+                     wfa_zscore=?, wfa_status=?, hfa_zscore=?, hfa_status=?, 
+                     wfh_zscore=?, wfh_status=?, hcfa_zscore=?, hcfa_status=?,
+                     risiko_stunting_persen=?, status_stunting=?
+                 WHERE id=?''',
+              (data['date'], data['name'], data['age'], data['sex'], data['alamat'], 
+               data['weight'], data['height'], data['hc'],
+               z_scores['wfa'], statuses['wfa'], z_scores['hfa'], statuses['hfa'],
+               z_scores['wfh'], statuses['wfh'], z_scores['hcfa'], statuses['hcfa'],
+               risk, status_stunting, record_id))
+    conn.commit()
+    conn.close()
+
+def delete_measurement(record_id):
+    conn = sqlite3.connect('.secret/krenova_data.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM measurements WHERE id=?', (record_id,))
+    conn.commit()
+    conn.close()
+
+def get_measurement_by_id(record_id):
+    conn = sqlite3.connect('.secret/krenova_data.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM measurements WHERE id=?', (record_id,))
+    result = c.fetchone()
+    conn.close()
+    return result
+
+# Initialize database
+init_database()
+
+# ========= SESSION STATE
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+if 'username' not in st.session_state:
+    st.session_state.username = 'pengguna_umum'
+if 'role' not in st.session_state:
+    st.session_state.role = 'user'
+if 'nama_lengkap' not in st.session_state:
+    st.session_state.nama_lengkap = 'Pengguna Umum'
+if 'view_mode' not in st.session_state:
+    st.session_state.view_mode = 'public'  # public atau admin
+if 'edit_record_id' not in st.session_state:
+    st.session_state.edit_record_id = None
+if 'delete_confirm_id' not in st.session_state:
+    st.session_state.delete_confirm_id = None
+
+# ========= BACA DATA
+wfa = pd.read_csv("wfa-all.csv")
+hfa = pd.read_csv("lhfa-all.csv")
+wfh = pd.read_csv("wfh-all.csv")
+hcfa = pd.read_csv("hcfa-all.csv")
+
+# ========== FUNGSI Z-Score
+def who_zscore(x, L, M, S):
+    if L == 0:
+        return np.log(x/M)/S
+    return ((x / M) ** L - 1) / (L * S)
+
+# ========== FUNGSI INDIKATOR
+## BB Terhadap Usia
+def calc_wfa(age, sex, weight):
+    ref = wfa[
+        (wfa['Usia'] == age) &
+        (wfa['Gender'] == sex)
+    ]
+    if ref.empty:
+        return None
+
+    L, M, S = ref[["L", "M", "S"]].values[0]
+    return who_zscore(weight, L, M, S)
+
+## TB Terhadap Usia
+def calc_hfa(age, sex, height):
+    ref = hfa[
+        (hfa['Usia'] == age) &
+        (hfa['Gender'] == sex)
+        ]
+    if ref.empty:
+        return None
+
+    L, M, S = ref[["L", "M", "S"]].values[0]
+    return who_zscore(height, L, M, S)
+
+## BB Terhadap Panjang/Tinggi Badan
+def calc_wfh(age, sex, weight, body_cm):
+    # Tentukan tipe pengukuran berdasarkan usia
+    m_type = "Length" if age < 24 else "Height"
+
+    # Filter data WHO sesuai kolom dataset kamu
+    ref = wfh[
+        (wfh["Gender"] == sex) &
+        (wfh["Pengukuran"] == m_type) &
+        (wfh["Tinggi"] == round(body_cm, 1))
+    ]
+
+    if ref.empty:
+        return None
+
+    L, M, S = ref[["L", "M", "S"]].values[0]
+    return who_zscore(weight, L, M, S)
+
+## LK Berdasarkan Usia
+def calc_hcfa(age, sex, hc):
+    ref = hcfa[
+        (hcfa['Usia'] == age) &
+        (hcfa['Gender'] == sex)
+    ]
+    if ref.empty:
+        return None
+    L, M, S = ref[["L", "M", "S"]].values[0]
+    return who_zscore(hc, L, M, S)
+
+## ======= STATUS STUNTING (HFA)
+def stunting_status(z):
+    if z < -2:
+        return "Berisiko Stunting"
+    return "Tidak Berisiko Stunting"
+
+## ======= EVALUASI GIZI
+### Berat/Usia
+def wfa_status(z):
+    if z is None:
+        return None
+    elif z < -3 :
+        return "Berat Anak Sangat Kurang"
+    elif z < -2:
+        return "Berat Anak Kurang"
+    elif z > 2:
+        return "Berat Badan Anak Berlebih"
+    elif z > 3:
+        return "Anak Obesitas"
+    else:
+        return "Berat Badan Anak Normal"
+
+### Tinggi/Usia
+def hfa_status(z):
+    if z is None:
+        return None
+    elif z < -3:
+        return "Anak Sangat Pendek"
+    elif z < -2:
+        return "Anak Pendek"
+    elif z > 3:
+        return "Anak Tinggi"
+    else:
+        return "Tinggi Anak Normal"
+
+### Berat/Tinggi
+def wfh_status(z):
+    if z is None:
+        return None
+    elif z < -3:
+        return "Gizi Anak Buruk"
+    elif z < -2:
+        return "Gizi Anak Kurang"
+    elif z > 2:
+        return "Anak Overweight"
+    elif z > 3:
+        return  "Anak Obesitas"
+    else:
+        return "Gizi Anak Baik/Normal"
+
+### Lingkar Kepala/Usia
+def hcaf_status(z):
+    if z is None:
+        return None
+    elif z < -2:
+        return "Anak Terindikasi Microcephaly. Berisiko keterlambatan kognitif, motorik, dan belajar jangka panjang, serta gangguan neurologis"
+    elif z > 2:
+        return "Anak Terindikasi Macrocephaly. Indikasi adanya hydrocephalus atau masalah genetik, memerlukan skrining dini"
+    else:
+        return "Lingkar Kepala Anak Normal"
+
+## ======= SAFE ROUND
+def safe_round(x):
+    return round(x, 2) if x is not None else None
+
+## ======= RISK STUNTING (%)
+def stunting_risk_percent(hfa, wfa):
+    score = 0
+
+    if hfa < -2:
+        score += 60
+    if wfa < -2:
+        score += 40
+    return min(score, 100)
+
+
+## ========= STREAMLIT
+st.set_page_config(page_title="Si Tumbuh - Sistem Informasi Tumbuh Kembang Anak", page_icon="👶", layout="wide")
+
+# Custom CSS untuk mempercantik
+st.markdown("""
+<style>
+    /* Background colors */
+    .main {
+        background-color: #FFFFF0;
+    }
+    [data-testid="stSidebar"] {
+        background-color: #DBE4C9;
+    }
+    [data-testid="stSidebar"] .element-container {
+        color: #1a1a1a;
+    }
+    [data-testid="stSidebar"] * {
+        color: #1a1a1a !important;
+    }
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] h4 {
+        color: #8AA624 !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Radio buttons in sidebar */
+    [data-testid="stSidebar"] .stRadio > label {
+        background-color: #8AA624;
+        color: #FFFFFF;
+        padding: 0.6rem;
+        border-radius: 8px;
+        font-weight: 700;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    [data-testid="stSidebar"] .stRadio > div {
+        background-color: #FFFFFF;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        border: 2px solid #8AA624;
+    }
+    [data-testid="stSidebar"] .stRadio label {
+        background-color: transparent !important;
+        color: #1a1a1a !important;
+        padding: 0.4rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .main-header {
+        font-size: 2.5rem;
+        color: #8AA624;
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    .sub-header {
+        font-size: 1.2rem;
+        color: #555;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .stButton>button {
+        width: 100%;
+        background: linear-gradient(135deg, #8AA624 0%, #6d851d 100%);
+        color: #FFFFFF;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        border: 2px solid #FEA405;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .stButton>button:hover {
+        background: linear-gradient(135deg, #6d851d 0%, #5a6e18 100%);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        transform: translateY(-1px);
+    }
+    .result-box {
+        background-color: #FFFFFF;
+        padding: 1.5rem;
+        border-radius: 10px;
+        border-left: 6px solid #8AA624;
+        margin: 1rem 0;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        border: 2px solid #DBE4C9;
+    }
+    .metric-card {
+        background: linear-gradient(135deg, #8AA624 0%, #6d851d 100%);
+        padding: 1.2rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        border: 3px solid #FEA405;
+        margin: 0.5rem 0;
+    }
+    .metric-card h4 {
+        color: #FFFFFF;
+        font-weight: 700;
+        margin-bottom: 0.8rem;
+        font-size: 1.1rem;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    .metric-card p {
+        color: #FFFFFF;
+        font-weight: 500;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    /* Form inputs - lebih kontras */
+    .stTextInput>div>div>input,
+    .stNumberInput>div>div>input,
+    .stDateInput>div>div>input {
+        background-color: #FFF9E6 !important;
+        border: 3px solid #8AA624 !important;
+        border-radius: 8px;
+        padding: 0.6rem !important;
+        color: #000000 !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+    }
+    .stTextInput>div>div>input::placeholder {
+        color: #666666 !important;
+        opacity: 0.7;
+    }
+    .stSelectbox>div>div>div {
+        background-color: #FFF9E6 !important;
+        border: 3px solid #8AA624 !important;
+        border-radius: 8px;
+    }
+    .stSelectbox>div>div>div>div {
+        color: #000000 !important;
+        font-weight: 600 !important;
+    }
+    .stTextInput label,
+    .stNumberInput label,
+    .stDateInput label,
+    .stSelectbox label {
+        color: #000000 !important;
+        font-weight: 800 !important;
+        font-size: 1.15rem !important;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        margin-bottom: 0.4rem !important;
+        letter-spacing: 0.3px;
+    }
+    .stTextInput > label > div,
+    .stNumberInput > label > div,
+    .stDateInput > label > div,
+    .stSelectbox > label > div {
+        color: #000000 !important;
+        font-weight: 800 !important;
+        font-size: 1.15rem !important;
+    }
+    
+    /* Headers in content */
+    h1, h2, h3 {
+        color: #8AA624;
+        font-weight: 700;
+    }
+    h1 {
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    h2, h3 {
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    /* Info boxes */
+    .stAlert {
+        background-color: #FFFFFF !important;
+        border: 3px solid #8AA624 !important;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .stAlert > div {
+        color: #1a1a1a !important;
+        font-weight: 500;
+    }
+    
+    /* Expander styling */
+    .streamlit-expanderHeader {
+        background-color: #FFFFFF !important;
+        border: 3px solid #8AA624 !important;
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        color: #1a1a1a !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Delete button */
+    button[kind="secondary"] {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        border: 2px solid #a71d2a !important;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.2) !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2) !important;
+    }
+    button[kind="secondary"]:hover {
+        background: linear-gradient(135deg, #c82333 0%, #a71d2a 100%) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ========= MAIN APP
+# Header dengan info user atau tombol login admin
+if st.session_state.view_mode == 'public':
+    # Mode Publik - Tampilkan header dengan tombol login admin
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.markdown(f"<h1 class='main-header'>👶 Si Tumbuh - Sistem Informasi Tumbuh Kembang Anak</h1>", unsafe_allow_html=True)
+        st.markdown("<p class='sub-header'>Berdasarkan Standar WHO</p>", unsafe_allow_html=True)
+    with col2:
+        st.write("")
+        st.write("")
+        if st.button("🔐 Login Admin", use_container_width=True):
+            st.session_state.show_login_modal = True
+            st.rerun()
+else:
+    # Mode Admin - Tampilkan header dengan info user
+    col1, col2, col3 = st.columns([3, 1, 1])
+    with col1:
+        st.markdown(f"<h1 class='main-header'>👶 Si Tumbuh</h1>", unsafe_allow_html=True)
+    with col2:
+        st.write(f"**{st.session_state.nama_lengkap}**")
+        st.caption(f"Role: {st.session_state.role.upper()}")
+    with col3:
+        if st.button("🚪 Logout"):
+            st.session_state.logged_in = False
+            st.session_state.username = 'pengguna_umum'
+            st.session_state.role = 'user'
+            st.session_state.nama_lengkap = 'Pengguna Umum'
+            st.session_state.view_mode = 'public'
+            if 'show_login_modal' in st.session_state:
+                del st.session_state.show_login_modal
+            st.rerun()
+
+# Login Modal (Popup)
+if 'show_login_modal' in st.session_state and st.session_state.show_login_modal:
+    with st.container():
+        st.markdown("---")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("### 🔐 Login Admin")
+            
+            with st.form("login_form"):
+                username = st.text_input("Username", placeholder="Masukkan username")
+                password = st.text_input("Password", type="password", placeholder="Masukkan password")
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    submit = st.form_submit_button("Login", use_container_width=True)
+                with col_b:
+                    cancel = st.form_submit_button("Batal", use_container_width=True)
+                
+                if submit:
+                    user = verify_login(username, password)
+                    if user:
+                        st.session_state.logged_in = True
+                        st.session_state.username = user[1]
+                        st.session_state.role = user[3]
+                        st.session_state.nama_lengkap = user[4]
+                        st.session_state.view_mode = 'admin'
+                        del st.session_state.show_login_modal
+                        st.success(f"Selamat datang, {user[4]}!")
+                        st.rerun()
+                    else:
+                        st.error("Username atau password salah!")
+                
+                if cancel:
+                    del st.session_state.show_login_modal
+                    st.rerun()
+        st.markdown("---")
+    st.stop()
+
+st.markdown("---")
+
+# Sidebar Navigation
+st.sidebar.title("📋 Menu Navigasi")
+
+if st.session_state.view_mode == 'public':
+    st.sidebar.info("👥 Mode: Akses Publik\n\nAnda dapat menggunakan fitur skrining dan melihat panduan pengukuran.\n\nLogin sebagai admin untuk mengakses database.")
+else:
+    st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
+
+menu_options = ["🏠 Skrining Gizi", "📏 Cara Pengukuran"]
+if st.session_state.view_mode == 'admin' and st.session_state.role == 'admin':
+    menu_options.append("📊 Database (Admin)")
+
+page = st.sidebar.radio("Pilih Menu:", menu_options)
+
+# ========= ADMIN DATABASE PAGE
+if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and st.session_state.role == 'admin':
+    st.title("📊 Database Hasil Pengukuran")
+    st.markdown("Dashboard untuk melihat semua data pengukuran yang telah direkam")
+    
+    df = get_all_measurements()
+    
+    if not df.empty:
+        # Statistik
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Pengukuran", len(df))
+        with col2:
+            stunting_count = len(df[df['status_stunting'] != 'Tidak Berisiko Stunting'])
+            st.metric("Risiko Stunting", stunting_count)
+        with col3:
+            avg_age = df['usia_bulan'].mean()
+            st.metric("Rata-rata Usia", f"{avg_age:.1f} bulan")
+        with col4:
+            avg_risk = df['risiko_stunting_persen'].mean()
+            st.metric("Rata-rata Risiko", f"{avg_risk:.1f}%")
+        
+        st.markdown("---")
+        
+        # Visualisasi Diagram Status Stunting
+        st.subheader("📊 Diagram Persentase Status Stunting")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Pie Chart - Status Stunting
+            status_counts = df['status_stunting'].value_counts()
+            
+            # Create data for pie chart
+            import plotly.graph_objects as go
+            
+            colors = {
+                'Tidak Berisiko Stunting': '#8AA624',
+                'Berisiko Stunting': '#FEA405'
+            }
+            
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=status_counts.index,
+                values=status_counts.values,
+                marker=dict(colors=[colors.get(label, '#999') for label in status_counts.index]),
+                hole=.3,
+                textposition='auto',
+                textinfo='label+percent+value'
+            )])
+            
+            fig_pie.update_layout(
+                title="Distribusi Status Stunting",
+                showlegend=True,
+                height=400
+            )
+            
+            st.plotly_chart(fig_pie, use_container_width=True)
+        
+        with col2:
+            # Bar Chart - Perbandingan
+            total_anak = len(df)
+            berisiko = len(df[df['status_stunting'] != 'Tidak Berisiko Stunting'])
+            tidak_berisiko = total_anak - berisiko
+            
+            persentase_berisiko = (berisiko / total_anak * 100) if total_anak > 0 else 0
+            persentase_tidak_berisiko = (tidak_berisiko / total_anak * 100) if total_anak > 0 else 0
+            
+            fig_bar = go.Figure(data=[
+                go.Bar(
+                    x=['Tidak Berisiko', 'Berisiko Stunting'],
+                    y=[tidak_berisiko, berisiko],
+                    text=[f'{tidak_berisiko}<br>({persentase_tidak_berisiko:.1f}%)', 
+                          f'{berisiko}<br>({persentase_berisiko:.1f}%)'],
+                    textposition='auto',
+                    marker=dict(color=['#8AA624', '#FEA405'])
+                )
+            ])
+            
+            fig_bar.update_layout(
+                title="Perbandingan Risiko Stunting",
+                xaxis_title="Status",
+                yaxis_title="Jumlah Anak",
+                showlegend=False,
+                height=400
+            )
+            
+            st.plotly_chart(fig_bar, use_container_width=True)
+        
+        st.markdown("---")
+        
+        # Statistik per Daerah
+        st.subheader("📍 Statistik Risiko Stunting per Daerah")
+        if 'alamat' in df.columns:
+            alamat_stats = df.groupby('alamat').agg({
+                'id': 'count',
+                'status_stunting': lambda x: (x != 'Tidak Berisiko Stunting').sum(),
+                'risiko_stunting_persen': 'mean'
+            }).rename(columns={
+                'id': 'Total Anak',
+                'status_stunting': 'Berisiko Stunting',
+                'risiko_stunting_persen': 'Rata-rata Risiko (%)'
+            }).sort_values('Berisiko Stunting', ascending=False)
+            
+            alamat_stats['Persentase Risiko'] = (alamat_stats['Berisiko Stunting'] / alamat_stats['Total Anak'] * 100).round(1)
+            st.dataframe(alamat_stats, use_container_width=True)
+        
+        st.markdown("---")
+        
+        # Filter
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            filter_gender = st.selectbox("Filter Gender", ["Semua", "L", "P"])
+        with col2:
+            filter_status = st.selectbox("Filter Status", 
+                ["Semua", "Tidak Berisiko Stunting", "Berisiko Stunting"])
+        with col3:
+            unique_alamat = ["Semua"] + sorted(df['alamat'].dropna().unique().tolist()) if 'alamat' in df.columns else ["Semua"]
+            filter_alamat = st.selectbox("Filter Alamat", unique_alamat)
+        with col4:
+            search_name = st.text_input("Cari Nama Anak", "")
+        
+        # Apply filters
+        filtered_df = df.copy()
+        if filter_gender != "Semua":
+            filtered_df = filtered_df[filtered_df['gender'] == filter_gender]
+        if filter_status != "Semua":
+            filtered_df = filtered_df[filtered_df['status_stunting'] == filter_status]
+        if filter_alamat != "Semua" and 'alamat' in df.columns:
+            filtered_df = filtered_df[filtered_df['alamat'] == filter_alamat]
+        if search_name:
+            filtered_df = filtered_df[filtered_df['nama_anak'].str.contains(search_name, case=False, na=False)]
+        
+        st.markdown("---")
+        
+        # Form Edit Data
+        if st.session_state.edit_record_id is not None:
+            record = get_measurement_by_id(st.session_state.edit_record_id)
+            if record:
+                st.subheader("✏️ Edit Data Pengukuran")
+                
+                with st.form("edit_form"):
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        edit_date = st.date_input("Tanggal Pengukuran", value=pd.to_datetime(record[1]).date())
+                        edit_name = st.text_input("Nama Anak", value=record[2])
+                        edit_alamat = st.text_input("Alamat/Desa", value=record[5])
+                        edit_age = st.number_input("Usia (bulan)", min_value=0, max_value=60, value=record[3])
+                        edit_sex = st.selectbox("Jenis Kelamin", ["L", "P"], 
+                                              index=0 if record[4] == "L" else 1,
+                                              format_func=lambda x: "Laki-laki" if x == "L" else "Perempuan")
+                    
+                    with col2:
+                        edit_weight = st.number_input("Berat Badan (kg)", min_value=0.0, max_value=50.0, 
+                                                     value=float(record[6]), step=0.1, format="%.1f")
+                        edit_height = st.number_input("Tinggi Badan (cm)", min_value=0.0, max_value=150.0, 
+                                                     value=float(record[7]), step=0.1, format="%.1f")
+                        edit_hc = st.number_input("Lingkar Kepala (cm)", min_value=0.0, max_value=60.0, 
+                                                 value=float(record[8]), step=0.1, format="%.1f")
+                    
+                    col_submit, col_cancel = st.columns(2)
+                    with col_submit:
+                        submit_edit = st.form_submit_button("✅ Simpan Perubahan", use_container_width=True)
+                    with col_cancel:
+                        cancel_edit = st.form_submit_button("❌ Batal", use_container_width=True)
+                    
+                    if submit_edit:
+                        # Hitung ulang Z-Scores
+                        edit_data = {
+                            "date": edit_date,
+                            "name": edit_name,
+                            "alamat": edit_alamat,
+                            "age": int(edit_age),
+                            "sex": edit_sex,
+                            "weight": edit_weight,
+                            "height": edit_height,
+                            "hc": edit_hc
+                        }
+                        
+                        waz_z = calc_wfa(edit_data["age"], edit_data["sex"], edit_data["weight"])
+                        waz_label = wfa_status(waz_z)
+                        haz_z = calc_hfa(edit_data["age"], edit_data["sex"], edit_data["height"])
+                        haz_label = hfa_status(haz_z)
+                        whz_z = calc_wfh(edit_data["age"], edit_data["sex"], edit_data["weight"], edit_data["height"])
+                        whz_label = wfh_status(whz_z)
+                        hcz_z = calc_hcfa(edit_data["age"], edit_data["sex"], edit_data["hc"])
+                        hcz_label = hcaf_status(hcz_z)
+                        
+                        risk = stunting_risk_percent(haz_z, waz_z) if haz_z and waz_z else None
+                        status = stunting_status(haz_z) if haz_z else None
+                        
+                        WFA = safe_round(waz_z)
+                        HFA = safe_round(haz_z)
+                        WFH = safe_round(whz_z)
+                        HCFA = safe_round(hcz_z)
+                        
+                        z_scores = {'wfa': WFA, 'hfa': HFA, 'wfh': WFH, 'hcfa': HCFA}
+                        statuses = {'wfa': waz_label, 'hfa': haz_label, 'wfh': whz_label, 'hcfa': hcz_label}
+                        
+                        update_measurement(st.session_state.edit_record_id, edit_data, z_scores, statuses, risk, status)
+                        st.success("✅ Data berhasil diupdate!")
+                        st.session_state.edit_record_id = None
+                        st.rerun()
+                    
+                    if cancel_edit:
+                        st.session_state.edit_record_id = None
+                        st.rerun()
+                
+                st.markdown("---")
+        
+        # Konfirmasi Delete
+        if st.session_state.delete_confirm_id is not None:
+            st.warning("⚠️ Apakah Anda yakin ingin menghapus data ini?")
+            col1, col2, col3 = st.columns([1, 1, 2])
+            with col1:
+                if st.button("✅ Ya, Hapus", use_container_width=True):
+                    delete_measurement(st.session_state.delete_confirm_id)
+                    st.success("✅ Data berhasil dihapus!")
+                    st.session_state.delete_confirm_id = None
+                    st.rerun()
+            with col2:
+                if st.button("❌ Batal", use_container_width=True):
+                    st.session_state.delete_confirm_id = None
+                    st.rerun()
+            st.markdown("---")
+        
+        # Display table
+        st.subheader(f"📋 Data Pengukuran ({len(filtered_df)} records)")
+        
+        # Format display columns
+        display_cols = ['id', 'tanggal_pengukuran', 'nama_anak', 'usia_bulan', 'gender']
+        display_names = ['ID', 'Tanggal', 'Nama', 'Usia (bln)', 'Gender']
+        
+        if 'alamat' in filtered_df.columns:
+            display_cols.append('alamat')
+            display_names.append('Alamat')
+        
+        display_cols.extend([
+            'berat_badan', 'tinggi_badan', 'lingkar_kepala',
+            'wfa_zscore', 'hfa_zscore', 'wfh_zscore', 'hcfa_zscore',
+            'risiko_stunting_persen', 'status_stunting', 'created_by'
+        ])
+        display_names.extend([
+            'BB (kg)', 'TB (cm)', 'LK (cm)',
+            'WFA Z', 'HFA Z', 'WFH Z', 'HCFA Z',
+            'Risiko %', 'Status', 'Oleh'
+        ])
+        
+        display_df = filtered_df[display_cols].copy()
+        display_df.columns = display_names
+        
+        st.dataframe(display_df, use_container_width=True, height=400)
+        
+        st.markdown("---")
+        
+        # Aksi Edit dan Delete dengan input ID
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            record_id_to_edit = st.number_input("Masukkan ID untuk Edit", min_value=0, step=1, value=0, key="id_edit")
+            if st.button("✏️ Edit Data", use_container_width=True):
+                if record_id_to_edit > 0:
+                    st.session_state.edit_record_id = record_id_to_edit
+                    st.rerun()
+                else:
+                    st.warning("Masukkan ID yang valid")
+        
+        with col2:
+            record_id_to_delete = st.number_input("Masukkan ID untuk Hapus", min_value=0, step=1, value=0, key="id_delete")
+            if st.button("🗑️ Hapus Data", use_container_width=True, type="secondary"):
+                if record_id_to_delete > 0:
+                    st.session_state.delete_confirm_id = record_id_to_delete
+                    st.rerun()
+                else:
+                    st.warning("Masukkan ID yang valid")
+        
+        st.markdown("---")
+        csv = filtered_df.to_csv(index=False)
+        st.download_button(
+            label="📥 Download Data (CSV)",
+            data=csv,
+            file_name=f"data_stunting_{dt.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime="text/csv",
+        )
+    
+    else:
+        st.info("Belum ada data pengukuran yang tersimpan.")
+
+# ========= CARA PENGUKURAN PAGE
+elif page == "📏 Cara Pengukuran":
+    st.image("image.jpg", caption="Anak Sehat Indonesia", width=400)
+    st.title("📏 Panduan Cara Pengukuran Antropometri Anak")
+    st.write("Panduan pengukuran antropometri untuk kader posyandu berdasarkan standar WHO dan Kemenkes RI")
+    st.info("📚 **Referensi:** Booklet Petunjuk Teknis Pengukuran Antropometri Dan Pencatatan Hasil Antropometri Dalam Buku KIA Bagi Kader - Kementerian Kesehatan RI")
+    
+    st.markdown("---")
+    
+    # 1. Berat Badan
+    st.header("1️⃣ Pengukuran Berat Badan")
+    st.markdown("""
+    **Alat yang digunakan:**
+    - Timbangan digital bayi (untuk anak < 2 tahun)
+    - Timbangan digital anak (untuk anak ≥ 2 tahun)
+    - Timbangan dacin (alternatif di posyandu)
+    
+    **Prosedur Pengukuran:**
+    
+    **A. Untuk Bayi/Balita dengan Timbangan Digital:**
+    1. Nyalakan timbangan dan pastikan menunjukkan angka 0 (nol)
+    2. Lepaskan pakaian bayi/balita, biarkan hanya memakai popok atau celana dalam
+    3. Letakkan bayi/balita di tengah-tengah timbangan dengan hati-hati
+    4. Pastikan seluruh tubuh bayi/balita berada di atas timbangan
+    5. Tunggu hingga angka pada layar stabil (tidak berubah-ubah)
+    6. Baca dan catat hasil timbangan dalam kilogram (kg) dengan 1 desimal
+    7. Contoh pencatatan: 8.5 kg, 12.3 kg
+    
+    **B. Untuk Balita dengan Timbangan Dacin:**
+    1. Gantungkan dacin pada tempat yang kuat dan stabil
+    2. Pastikan dacin dalam posisi seimbang (bandul geser di angka 0)
+    3. Pasang celana timbang atau sarung timbang
+    4. Masukkan anak ke dalam celana/sarung timbang
+    5. Geser bandul hingga dacin seimbang (batang dacin horizontal)
+    6. Baca angka pada skala dacin
+    7. Catat berat badan dalam kilogram
+    
+    **Tips Penting:**
+    - Timbang anak pada waktu yang sama setiap bulan (pagi hari lebih baik)
+    - Pastikan timbangan sudah dikalibrasi dan akurat
+    - Anak harus dalam kondisi tenang, tidak menangis atau bergerak berlebihan
+    - Timbang minimal 2 kali untuk memastikan hasil akurat
+    - Jika hasil berbeda > 0.1 kg, timbang sekali lagi
+    - Catat hasil segera di Buku KIA dan kartu menuju sehat (KMS)
+    """)
+    
+    st.markdown("---")
+    
+    # 2. Panjang/Tinggi Badan
+    st.header("2️⃣ Pengukuran Panjang/Tinggi Badan")
+    st.markdown("""
+    **Alat yang digunakan:**
+    - **Infantometer/Length Board** (untuk mengukur panjang badan anak < 2 tahun atau < 85 cm)
+    - **Microtoise/Stadiometer** (untuk mengukur tinggi badan anak ≥ 2 tahun atau ≥ 85 cm)
+    
+    **A. Pengukuran Panjang Badan (Posisi Berbaring) - Anak < 2 Tahun:**
+    
+    **Persiapan:**
+    - Gunakan papan pengukur (length board/infantometer)
+    - Butuh 2 orang: 1 pengukur dan 1 pembantu
+    - Lepaskan sepatu, topi, dan kunciran/jepit rambut anak
+    
+    **Langkah-langkah:**
+    1. Baringkan anak di atas papan pengukur dengan posisi telentang
+    2. **Pembantu:** Pegang kepala anak dengan kedua tangan agar:
+       - Mahkota kepala (ubun-ubun) menempel pada headboard (papan kepala)
+       - Mata anak menghadap lurus ke atas (Frankfurt plane)
+       - Bahu menempel rata pada papan pengukur
+    3. **Pengukur:** Berdiri di sisi kaki anak:
+       - Luruskan kedua kaki anak dengan lembut (jangan dipaksa)
+       - Tekan lutut anak agar lurus (tidak bengkok)
+       - Kedua telapak kaki tegak lurus (90°) terhadap papan
+    4. Geser footboard (papan kaki) hingga menempel kuat pada telapak kaki
+    5. Baca angka pada skala di tepi footboard
+    6. Catat hasil dalam sentimeter (cm) dengan 1 desimal
+    
+    **Contoh:** 75.5 cm, 82.3 cm
+    
+    ---
+    
+    **B. Pengukuran Tinggi Badan (Posisi Berdiri) - Anak ≥ 2 Tahun:**
+    
+    **Persiapan:**
+    - Gunakan microtoise atau stadiometer
+    - Lepaskan sepatu, topi, dan aksesoris rambut
+    - Butuh 1-2 orang (tergantung kooperatif tidaknya anak)
+    
+    **Langkah-langkah:**
+    1. Pasang microtoise di dinding yang rata dan tegak lurus
+    2. Anak berdiri tegak membelakangi dinding/microtoise:
+       - **Tumit:** menempel dinding, kedua kaki rapat
+       - **Bokong:** menempel dinding
+       - **Bahu:** menempel dinding (punggung lurus)
+       - **Kepala bagian belakang:** menempel dinding
+    3. Posisi kepala tegak lurus:
+       - Pandangan lurus ke depan
+       - Garis dari lubang telinga ke mata harus horizontal (Frankfurt plane)
+       - Dagu tidak boleh mendongak atau menunduk
+    4. Kedua tangan lurus di samping badan, rileks
+    5. Tarik napas dalam, berdiri setegak mungkin
+    6. Turunkan headpiece (bagian atas pengukur) hingga menempel di puncak kepala (ubun-ubun)
+    7. Pastikan headpiece tegak lurus, tidak miring
+    8. Baca angka pada jendela baca microtoise
+    9. Catat hasil dalam sentimeter (cm) dengan 1 desimal
+    
+    **Contoh:** 95.2 cm, 108.7 cm
+    
+    **Hal Penting:**
+    - **Konversi:** Jika anak < 2 tahun diukur berdiri, TAMBAHKAN 0.7 cm pada hasil
+    - **Konversi:** Jika anak ≥ 2 tahun diukur berbaring, KURANGI 0.7 cm pada hasil
+    - Ukur minimal 2 kali untuk memastikan akurasi
+    - Jika hasil berbeda > 0.5 cm, ukur kembali
+    - Anak harus dalam kondisi tenang dan kooperatif
+    - Jangan mengukur dengan rambut dikuncir tinggi atau memakai topi
+    
+    **Tips untuk Kader:**
+    - Ajak anak bicara agar tenang dan mau bekerjasama
+    - Pastikan anak tidak jinjit atau menekuk lutut
+    - Gunakan mainan atau nyanyian untuk mengalihkan perhatian bayi
+    - Catat hasil segera di Buku KIA dan KMS
+    """)
+    
+    st.markdown("---")
+    
+    # 3. Lingkar Kepala
+    st.header("3️⃣ Pengukuran Lingkar Kepala (Head Circumference)")
+    st.markdown("""
+    **Alat yang digunakan:**
+    - Pita pengukur (meteran) yang fleksibel, tidak elastis/tidak mudah melar
+    - Pita harus memiliki skala dalam sentimeter (cm) dengan ketelitian milimeter (mm)
+    
+    **Fungsi Pengukuran Lingkar Kepala:**
+    - Mendeteksi kelainan pertumbuhan otak (mikrosefali atau makrosefali)
+    - Indikator penting perkembangan otak bayi dan balita
+    - Wajib diukur terutama pada anak usia 0-24 bulan
+    
+    **Prosedur Pengukuran:**
+    
+    **Persiapan:**
+    - Lepaskan topi, bandana, atau aksesoris kepala
+    - Buka kunciran/jepit rambut yang tebal
+    - Anak dalam posisi duduk atau berbaring dengan tenang
+    - Butuh 1-2 orang (tergantung umur anak)
+    
+    **Langkah-langkah:**
+    1. **Tentukan titik pengukuran yang benar:**
+       - **Bagian Belakang:** Cari bagian kepala belakang yang paling menonjol (protuberantia occipitalis/prominens occipital)
+       - **Bagian Depan:** Cari bagian dahi yang paling menonjol, tepat di atas alis mata (glabella/supraorbital ridge)
+    
+    2. **Melingkarkan pita pengukur:**
+       - Letakkan pita di bagian belakang kepala (prominens occipital)
+       - Tarik pita melingkar ke depan melewati kedua sisi kepala
+       - Pita harus melewati bagian atas telinga (bukan menutupi telinga)
+       - Tarik pita hingga melingkar di dahi (bagian paling menonjol di atas alis)
+    
+    3. **Pastikan posisi pita benar:**
+       - Pita harus horizontal (sejajar lantai), tidak miring
+       - Pita tidak terlalu ketat hingga menekan kulit kepala
+       - Pita tidak terlalu longgar
+       - Pita melingkar di bagian kepala yang TERLEBAR
+    
+    4. **Membaca hasil:**
+       - Tarik pita dengan tekanan yang cukup (tidak terlalu kencang/longgar)
+       - Baca angka pada pita di titik pertemuan (angka 0 bertemu dengan angka hasil)
+       - Baca hasil dalam sentimeter (cm) dengan 1 desimal
+    
+    5. **Pencatatan:**
+       - Catat hasil pengukuran segera
+       - Contoh: 42.5 cm, 48.3 cm
+    
+    **Tips Penting:**
+    - Ukur lingkar kepala minimal 2-3 kali untuk memastikan konsistensi
+    - Jika hasil berbeda > 0.2 cm, ulangi pengukuran
+    - Jangan mengukur saat anak menangis keras (dapat menyebabkan pembengkakan sementara)
+    - Rambut yang tebal tidak mempengaruhi hasil (pita akan menekan rambut)
+    - Pastikan pita melingkar di bagian TERLEBAR kepala untuk hasil akurat
+    - Hindari mengukur tepat setelah anak tidur (kepala mungkin sedikit gepeng)
+    
+    **Perhatian Khusus:**
+    - Jika lingkar kepala terlalu kecil (mikrosefali) atau terlalu besar (makrosefali), segera rujuk ke tenaga kesehatan
+    - Lingkar kepala yang tidak normal bisa mengindikasikan masalah perkembangan otak
+    - Catat hasil di Buku KIA dan laporkan ke petugas kesehatan jika ada kelainan
+    """)
+    
+    st.markdown("---")
+    
+    # Hal Penting
+    st.header("⚠️ Hal-Hal Penting dalam Pengukuran Antropometri")
+    st.markdown("""
+    ### 📋 Persiapan Sebelum Pengukuran:
+    1. **Kalibrasi Alat:**
+       - Pastikan semua alat ukur (timbangan, microtoise, pita ukur) sudah dikalibrasi
+       - Cek timbangan dengan beban standar secara berkala
+       - Periksa kondisi alat sebelum digunakan (tidak rusak, tidak berkarat)
+    
+    2. **Kondisi Anak:**
+       - Anak dalam keadaan tenang, tidak menangis atau rewel
+       - Sebaiknya tidak baru selesai makan/minum (untuk penimbangan)
+       - Tidak demam atau sakit
+       - Kandung kemih sudah dikosongkan (buang air kecil dulu)
+    
+    3. **Waktu Pengukuran:**
+       - Lakukan pengukuran pada waktu yang sama setiap bulan
+       - Pagi hari lebih disarankan (kondisi anak lebih stabil)
+       - Untuk monitoring rutin, gunakan hari yang sama setiap bulan (misal: setiap tanggal 25)
+    
+    ### ✅ Ketelitian dan Akurasi:
+    1. **Pencatatan Hasil:**
+       - Semua hasil HARUS dicatat dengan **1 desimal**
+       - Contoh BENAR: 10.5 kg, 75.3 cm, 45.2 cm
+       - Contoh SALAH: 10 kg, 75 cm (tanpa desimal)
+    
+    2. **Pengulangan Pengukuran:**
+       - Lakukan pengukuran minimal **2 kali** untuk setiap parameter
+       - Jika selisih hasil:
+         * Berat badan: > 0.1 kg → ukur lagi
+         * Panjang/Tinggi: > 0.5 cm → ukur lagi
+         * Lingkar kepala: > 0.2 cm → ukur lagi
+       - Ambil nilai rata-rata jika kedua hasil mirip
+    
+    3. **Posisi Pengukuran:**
+       - Anak < 2 tahun (< 85 cm): ukur PANJANG badan (berbaring)
+       - Anak ≥ 2 tahun (≥ 85 cm): ukur TINGGI badan (berdiri)
+       - Jika salah posisi, gunakan KONVERSI: tambah/kurang 0.7 cm
+    
+    ### 📝 Dokumentasi dan Pencatatan:
+    1. **Catat Segera di:**
+       - Buku KIA (Kesehatan Ibu dan Anak)
+       - Kartu Menuju Sehat (KMS)
+       - Register Kohort Balita
+       - Formulir skrining/laporan posyandu
+    
+    2. **Informasi yang Harus Dicatat:**
+       - Tanggal pengukuran
+       - Nama lengkap anak
+       - Usia anak (dalam bulan)
+       - Hasil pengukuran: BB, TB/PB, LK
+       - Nama pengukur/kader
+       - Kondisi khusus (jika ada)
+    
+    3. **Plot di Grafik KMS:**
+       - Tandai hasil pengukuran berat dan tinggi badan di grafik KMS
+       - Hubungkan titik dengan titik pengukuran sebelumnya
+       - Lihat apakah garis pertumbuhan naik, mendatar, atau turun
+    
+    ### 🔍 Interpretasi Hasil:
+    1. **Waspada jika:**
+       - Garis pertumbuhan mendatar atau turun
+       - Berat badan tidak naik 2 bulan berturut-turut
+       - Tinggi badan jauh di bawah garis normal
+       - Lingkar kepala terlalu kecil atau terlalu besar
+    
+    2. **Tindak Lanjut:**
+       - Jika ditemukan masalah, segera rujuk ke Puskesmas/tenaga kesehatan
+       - Konseling gizi untuk orang tua
+       - Pemantauan lebih intensif (misalnya setiap 2 minggu)
+    
+    ### 🛡️ Privasi dan Etika:
+    - Jaga privasi anak dan keluarga
+    - Ukur di tempat yang nyaman dan tidak terlalu ramai
+    - Hormati anak, jangan memaksa jika anak sangat rewel
+    - Berikan penjelasan hasil kepada orang tua dengan bahasa yang mudah dipahami
+    - Jangan membuat orang tua panik, berikan informasi dengan bijak
+    
+    ### 📞 Kapan Harus Merujuk ke Tenaga Kesehatan:
+    - Berat badan sangat kurang (di bawah garis merah KMS)
+    - Tinggi badan sangat pendek untuk usianya
+    - Lingkar kepala terlalu kecil (mikrosefali) atau terlalu besar (makrosefali)
+    - Gizi buruk atau obesitas
+    - Bengkak pada kedua kaki (edema)
+    - Tidak ada kenaikan berat badan 2-3 bulan berturut-turut
+    """)
+    
+    st.markdown("---")
+    
+    st.success("""
+    ### 💡 Pesan untuk Kader Posyandu:
+    
+    Pengukuran antropometri yang **akurat** dan **teliti** sangat penting untuk:
+    - Mendeteksi dini masalah pertumbuhan anak
+    - Mencegah stunting dan malnutrisi
+    - Memantau efektivitas program gizi
+    - Memberikan intervensi yang tepat waktu
+    
+    **Peran kader sangat penting** dalam membantu menciptakan generasi Indonesia yang sehat, cerdas, dan bebas stunting!
+    """)
+    
+    st.info("📚 **Referensi:** Booklet Petunjuk Teknis Pengukuran Antropometri Dan Pencatatan Hasil Antropometri Dalam Buku KIA Bagi Kader - Kementerian Kesehatan RI")
+        
+    st.caption("⚕️ Jika ragu atau menemukan kelainan, segera konsultasikan dengan bidan, perawat, atau dokter di Puskesmas terdekat.")
+
+# ========= SKRINING GIZI PAGE
+elif page == "🏠 Skrining Gizi":
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.title("📋 Form Skrining - Si Tumbuh")
+        st.markdown("Silakan masukkan hasil pengukuran yang telah dilakukan dengan tepat!")
+    with col2:
+        try:
+            st.image("image.jpg", width=250)
+        except:
+            pass
+    
+    st.markdown("---")
+    
+    # Form Input dengan 2 kolom
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("📝 Data Anak")
+        date = st.date_input("Tanggal Pengukuran", value=None)
+        name = st.text_input("Nama Anak", placeholder="Masukkan nama lengkap anak")
+        alamat = st.text_input("Alamat/Desa", placeholder="Contoh: Desa Slogo, Kec. Tanon")
+        age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=0)
+        sex = st.selectbox("Jenis Kelamin", ["L", "P"], format_func=lambda x: "Laki-laki" if x == "L" else "Perempuan")
+    
+    with col2:
+        st.subheader("📏 Hasil Pengukuran")
+        weight = st.number_input("Berat Badan (kg)", min_value=0.0, max_value=50.0, step=0.1, format="%.1f")
+        height = st.number_input("Panjang/Tinggi Badan (cm)", min_value=0.0, max_value=150.0, step=0.1, format="%.1f")
+        hc = st.number_input("Lingkar Kepala (cm)", min_value=0.0, max_value=60.0, step=0.1, format="%.1f")
+    
+    st.markdown("---")
+    
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        analyze_button = st.button("🔍 Analisis Data", type="primary", use_container_width=True)
+    
+    if analyze_button:
+        if not name or not alamat or age == 0 or weight == 0 or height == 0 or hc == 0:
+            st.error("⚠️ Mohon lengkapi semua data pengukuran!")
+        else:
+            data = {
+                "date": date,
+                "name": name,
+                "alamat": alamat,
+                "age": int(age),
+                "sex": sex,
+                "weight": weight,
+                "height": height,
+                "hc": hc
+            }
+
+            # Hitung Z-Scores
+            waz_z = calc_wfa(data["age"], data["sex"], data["weight"])
+            waz_label = wfa_status(waz_z)
+            haz_z = calc_hfa(data["age"], data["sex"], data["height"])
+            haz_label = hfa_status(haz_z)
+            whz_z = calc_wfh(data["age"], data["sex"], data["weight"], data["height"])
+            whz_label = wfh_status(whz_z)
+            hcz_z = calc_hcfa(data["age"], data["sex"], data["hc"])
+            hcz_label = hcaf_status(hcz_z)
+
+            risk = stunting_risk_percent(haz_z, waz_z) if haz_z and waz_z else None
+            status = stunting_status(haz_z) if haz_z else None
+
+            WFA = safe_round(waz_z)
+            HFA = safe_round(haz_z)
+            WFH = safe_round(whz_z)
+            HCFA = safe_round(hcz_z)
+
+            status_z = {
+            "waz_z": WFA, "waz_label": waz_label,
+            "haz_z": HFA, "haz_label": haz_label,
+            "whz_z": WFH, "whz_label": whz_label,
+            "hcz_z": HCFA, "hcz_label": hcz_label }
+            
+            # Save to database
+            z_scores = {'wfa': WFA, 'hfa': HFA, 'wfh': WFH, 'hcfa': HCFA}
+            statuses = {'wfa': waz_label, 'hfa': haz_label, 'wfh': whz_label, 'hcfa': hcz_label}
+            save_measurement(data, z_scores, statuses, risk, status, st.session_state.username)
+            
+            st.success("✅ Data berhasil dianalisis dan disimpan!")
+            st.markdown("---")
+            
+            # Header Hasil
+            st.markdown(f"<h2 style='text-align: center; color: #8AA624;'>📊 Hasil Analisis: {data['name']}</h2>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>Tanggal Pengukuran: <b>{data['date']}</b> | Usia: <b>{data['age']} bulan</b> | Jenis Kelamin: <b>{'Laki-laki' if data['sex'] == 'L' else 'Perempuan'}</b></p>", unsafe_allow_html=True)
+            
+            st.markdown("---")
+            
+            # Data Antropometri dalam Cards
+            st.subheader("📊 Indikator Antropometri (Z-Score)")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown(f"""
+                <div class='metric-card'>
+                    <h4>⚖️ Berat Badan menurut Usia (WFA)</h4>
+                    <p style='font-size: 1.8rem; font-weight: 800; color: #FFEB3B; text-shadow: 2px 2px 3px rgba(0,0,0,0.4);'>Z-Score: {WFA}</p>
+                    <p style='font-size: 1.1rem;'><b>Status:</b> {waz_label}</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown(f"""
+                <div class='metric-card'>
+                    <h4>📏 Berat Badan menurut Tinggi (WFH)</h4>
+                    <p style='font-size: 1.8rem; font-weight: 800; color: #FFEB3B; text-shadow: 2px 2px 3px rgba(0,0,0,0.4);'>Z-Score: {WFH}</p>
+                    <p style='font-size: 1.1rem;'><b>Status:</b> {whz_label}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                st.markdown(f"""
+                <div class='metric-card'>
+                    <h4>📐 Tinggi Badan menurut Usia (HFA)</h4>
+                    <p style='font-size: 1.8rem; font-weight: 800; color: #FFEB3B; text-shadow: 2px 2px 3px rgba(0,0,0,0.4);'>Z-Score: {HFA}</p>
+                    <p style='font-size: 1.1rem;'><b>Status:</b> {haz_label}</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown(f"""
+                <div class='metric-card'>
+                    <h4>🧠 Lingkar Kepala menurut Usia (HCFA)</h4>
+                    <p style='font-size: 1.8rem; font-weight: 800; color: #FFEB3B; text-shadow: 2px 2px 3px rgba(0,0,0,0.4);'>Z-Score: {HCFA}</p>
+                    <p style='font-size: 1.1rem;'><b>Status:</b> {hcz_label}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("---")
+            
+            # Interpretasi Stunting
+            st.subheader("🩺 Interpretasi Risiko Stunting")
+            
+            col1, col2 = st.columns([1, 2])
+            with col1:
+                st.markdown(f"""
+                <div style='text-align: center; padding: 2rem; background: linear-gradient(135deg, #8AA624 0%, #FEA405 100%); border-radius: 15px; color: white;'>
+                    <h1 style='margin: 0; font-size: 3rem;'>{risk}%</h1>
+                    <p style='margin: 0; font-size: 1.2rem;'>Risiko Stunting</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                if status != "Tidak Berisiko Stunting":
+                    st.error(f"⚠️ **Status Stunting:** {status}")
+                else:
+                    st.success(f"✅ **Status Stunting:** {status}")
+            
+            st.markdown("---")
+            st.caption("⚕️ Hasil ini merupakan skrining awal. Untuk diagnosis dan penanganan lebih lanjut, konsultasikan dengan tenaga kesehatan profesional.")
+
+            # Output gemini
+            st.markdown("---")
+            st.markdown("### 🤖 Rekomendasi Gemini AI (Standard WHO)")
+            with st.spinner("AI sedang menganalisis data..."):
+                saran_ai = get_ai_analysis(data, status_z)
+                st.info(saran_ai)
