@@ -1225,7 +1225,7 @@ elif page == "📏 Cara Pengukuran":
     # st.caption("⚕️ Jika ragu atau menemukan kelainan, segera konsultasikan dengan bidan, perawat, atau dokter di Puskesmas terdekat.")
 
 # ========= SKRINING GIZI PAGE
-elif page == "🏠 Skrining Gizi":
+elif page == "🏠 Skrining Balita":
     col1, col2 = st.columns([2, 1])
     with col1:
         st.title("📋 Skrining Pertumbuhan & Status Gizi Anak")
