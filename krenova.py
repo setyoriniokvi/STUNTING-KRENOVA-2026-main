@@ -1227,13 +1227,13 @@ elif page == "📏 Cara Pengukuran":
 elif page == "🏠 Skrining Gizi":
     col1, col2 = st.columns([2, 1])
     with col1:
-        st.title("📋 Skrining - Si Tumbuh")
+        st.title("📋 Skrining - SI Tumbuh")
         st.markdown("Silakan masukkan hasil pengukuran yang telah dilakukan dengan tepat!")
-    with col2:
-        try:
-            st.image("header situmbuh.png", width=250)
-        except:
-            pass
+    # with col2:
+    #     try:
+    #         st.image("header situmbuh.png", width=250)
+    #     except:
+    #         pass
     
     st.markdown("---")
     
