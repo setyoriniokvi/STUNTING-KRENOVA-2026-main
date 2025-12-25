@@ -578,7 +578,8 @@ else:
     # Mode Admin - Tampilkan header dengan info user
     col1, col2, col3 = st.columns([3, 1, 1])
     with col1:
-        st.markdown(f"<h1 class='main-header'>👶 SI Tumbuh</h1>", unsafe_allow_html=True)
+        # st.markdown(f"<h1 class='main-header'>👶 SI Tumbuh</h1>", unsafe_allow_html=True)
+        st.image("header situmbuh.png")
     with col2:
         st.write(f"**{st.session_state.nama_lengkap}**")
         st.caption(f"Role: {st.session_state.role.upper()}")
