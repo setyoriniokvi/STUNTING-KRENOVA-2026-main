@@ -642,7 +642,7 @@ else:
 menu_options = ["🏠 Skrining Gizi", "📏 Cara Pengukuran"]
 if st.session_state.view_mode == 'admin' and st.session_state.role == 'admin':
     menu_options.append("📊 Database (Admin)")
-
+    
 page = st.sidebar.radio("Pilih Menu:", menu_options)
 
 # ========= ADMIN DATABASE PAGE
@@ -937,291 +937,291 @@ elif page == "📏 Cara Pengukuran":
     st.image("image.jpg", caption="Anak Sehat Indonesia", width=400)
     st.title("📏 Panduan Cara Pengukuran Antropometri Anak")
     st.write("Panduan pengukuran antropometri untuk kader posyandu berdasarkan standar WHO dan Kemenkes RI")
-    st.info("📚 **Referensi:** Booklet Petunjuk Teknis Pengukuran Antropometri Dan Pencatatan Hasil Antropometri Dalam Buku KIA Bagi Kader - Kementerian Kesehatan RI")
-    
+    st.info("📚 **Referensi:** Akun Youtube @direktoratYanKesga")
+    st.video('https://youtu.be/D-_JimQkBuA?si=Un2gdqlYUfy1fTQ6')
     st.markdown("---")
     
     # 1. Berat Badan
-    st.header("1️⃣ Pengukuran Berat Badan")
-    st.markdown("""
-    **Alat yang digunakan:**
-    - Timbangan digital bayi (untuk anak < 2 tahun)
-    - Timbangan digital anak (untuk anak ≥ 2 tahun)
-    - Timbangan dacin (alternatif di posyandu)
+    # st.header("1️⃣ Pengukuran Berat Badan")
+    # st.markdown("""
+    # **Alat yang digunakan:**
+    # - Timbangan digital bayi (untuk anak < 2 tahun)
+    # - Timbangan digital anak (untuk anak ≥ 2 tahun)
+    # - Timbangan dacin (alternatif di posyandu)
     
-    **Prosedur Pengukuran:**
+    # **Prosedur Pengukuran:**
     
-    **A. Untuk Bayi/Balita dengan Timbangan Digital:**
-    1. Nyalakan timbangan dan pastikan menunjukkan angka 0 (nol)
-    2. Lepaskan pakaian bayi/balita, biarkan hanya memakai popok atau celana dalam
-    3. Letakkan bayi/balita di tengah-tengah timbangan dengan hati-hati
-    4. Pastikan seluruh tubuh bayi/balita berada di atas timbangan
-    5. Tunggu hingga angka pada layar stabil (tidak berubah-ubah)
-    6. Baca dan catat hasil timbangan dalam kilogram (kg) dengan 1 desimal
-    7. Contoh pencatatan: 8.5 kg, 12.3 kg
+    # **A. Untuk Bayi/Balita dengan Timbangan Digital:**
+    # 1. Nyalakan timbangan dan pastikan menunjukkan angka 0 (nol)
+    # 2. Lepaskan pakaian bayi/balita, biarkan hanya memakai popok atau celana dalam
+    # 3. Letakkan bayi/balita di tengah-tengah timbangan dengan hati-hati
+    # 4. Pastikan seluruh tubuh bayi/balita berada di atas timbangan
+    # 5. Tunggu hingga angka pada layar stabil (tidak berubah-ubah)
+    # 6. Baca dan catat hasil timbangan dalam kilogram (kg) dengan 1 desimal
+    # 7. Contoh pencatatan: 8.5 kg, 12.3 kg
     
-    **B. Untuk Balita dengan Timbangan Dacin:**
-    1. Gantungkan dacin pada tempat yang kuat dan stabil
-    2. Pastikan dacin dalam posisi seimbang (bandul geser di angka 0)
-    3. Pasang celana timbang atau sarung timbang
-    4. Masukkan anak ke dalam celana/sarung timbang
-    5. Geser bandul hingga dacin seimbang (batang dacin horizontal)
-    6. Baca angka pada skala dacin
-    7. Catat berat badan dalam kilogram
+    # **B. Untuk Balita dengan Timbangan Dacin:**
+    # 1. Gantungkan dacin pada tempat yang kuat dan stabil
+    # 2. Pastikan dacin dalam posisi seimbang (bandul geser di angka 0)
+    # 3. Pasang celana timbang atau sarung timbang
+    # 4. Masukkan anak ke dalam celana/sarung timbang
+    # 5. Geser bandul hingga dacin seimbang (batang dacin horizontal)
+    # 6. Baca angka pada skala dacin
+    # 7. Catat berat badan dalam kilogram
     
-    **Tips Penting:**
-    - Timbang anak pada waktu yang sama setiap bulan (pagi hari lebih baik)
-    - Pastikan timbangan sudah dikalibrasi dan akurat
-    - Anak harus dalam kondisi tenang, tidak menangis atau bergerak berlebihan
-    - Timbang minimal 2 kali untuk memastikan hasil akurat
-    - Jika hasil berbeda > 0.1 kg, timbang sekali lagi
-    - Catat hasil segera di Buku KIA dan kartu menuju sehat (KMS)
-    """)
+    # **Tips Penting:**
+    # - Timbang anak pada waktu yang sama setiap bulan (pagi hari lebih baik)
+    # - Pastikan timbangan sudah dikalibrasi dan akurat
+    # - Anak harus dalam kondisi tenang, tidak menangis atau bergerak berlebihan
+    # - Timbang minimal 2 kali untuk memastikan hasil akurat
+    # - Jika hasil berbeda > 0.1 kg, timbang sekali lagi
+    # - Catat hasil segera di Buku KIA dan kartu menuju sehat (KMS)
+    # """)
     
-    st.markdown("---")
+    # st.markdown("---")
     
-    # 2. Panjang/Tinggi Badan
-    st.header("2️⃣ Pengukuran Panjang/Tinggi Badan")
-    st.markdown("""
-    **Alat yang digunakan:**
-    - **Infantometer/Length Board** (untuk mengukur panjang badan anak < 2 tahun atau < 85 cm)
-    - **Microtoise/Stadiometer** (untuk mengukur tinggi badan anak ≥ 2 tahun atau ≥ 85 cm)
+    # # 2. Panjang/Tinggi Badan
+    # st.header("2️⃣ Pengukuran Panjang/Tinggi Badan")
+    # st.markdown("""
+    # **Alat yang digunakan:**
+    # - **Infantometer/Length Board** (untuk mengukur panjang badan anak < 2 tahun atau < 85 cm)
+    # - **Microtoise/Stadiometer** (untuk mengukur tinggi badan anak ≥ 2 tahun atau ≥ 85 cm)
     
-    **A. Pengukuran Panjang Badan (Posisi Berbaring) - Anak < 2 Tahun:**
+    # **A. Pengukuran Panjang Badan (Posisi Berbaring) - Anak < 2 Tahun:**
     
-    **Persiapan:**
-    - Gunakan papan pengukur (length board/infantometer)
-    - Butuh 2 orang: 1 pengukur dan 1 pembantu
-    - Lepaskan sepatu, topi, dan kunciran/jepit rambut anak
+    # **Persiapan:**
+    # - Gunakan papan pengukur (length board/infantometer)
+    # - Butuh 2 orang: 1 pengukur dan 1 pembantu
+    # - Lepaskan sepatu, topi, dan kunciran/jepit rambut anak
     
-    **Langkah-langkah:**
-    1. Baringkan anak di atas papan pengukur dengan posisi telentang
-    2. **Pembantu:** Pegang kepala anak dengan kedua tangan agar:
-       - Mahkota kepala (ubun-ubun) menempel pada headboard (papan kepala)
-       - Mata anak menghadap lurus ke atas (Frankfurt plane)
-       - Bahu menempel rata pada papan pengukur
-    3. **Pengukur:** Berdiri di sisi kaki anak:
-       - Luruskan kedua kaki anak dengan lembut (jangan dipaksa)
-       - Tekan lutut anak agar lurus (tidak bengkok)
-       - Kedua telapak kaki tegak lurus (90°) terhadap papan
-    4. Geser footboard (papan kaki) hingga menempel kuat pada telapak kaki
-    5. Baca angka pada skala di tepi footboard
-    6. Catat hasil dalam sentimeter (cm) dengan 1 desimal
+    # **Langkah-langkah:**
+    # 1. Baringkan anak di atas papan pengukur dengan posisi telentang
+    # 2. **Pembantu:** Pegang kepala anak dengan kedua tangan agar:
+    #    - Mahkota kepala (ubun-ubun) menempel pada headboard (papan kepala)
+    #    - Mata anak menghadap lurus ke atas (Frankfurt plane)
+    #    - Bahu menempel rata pada papan pengukur
+    # 3. **Pengukur:** Berdiri di sisi kaki anak:
+    #    - Luruskan kedua kaki anak dengan lembut (jangan dipaksa)
+    #    - Tekan lutut anak agar lurus (tidak bengkok)
+    #    - Kedua telapak kaki tegak lurus (90°) terhadap papan
+    # 4. Geser footboard (papan kaki) hingga menempel kuat pada telapak kaki
+    # 5. Baca angka pada skala di tepi footboard
+    # 6. Catat hasil dalam sentimeter (cm) dengan 1 desimal
     
-    **Contoh:** 75.5 cm, 82.3 cm
+    # **Contoh:** 75.5 cm, 82.3 cm
     
-    ---
+    # ---
     
-    **B. Pengukuran Tinggi Badan (Posisi Berdiri) - Anak ≥ 2 Tahun:**
+    # **B. Pengukuran Tinggi Badan (Posisi Berdiri) - Anak ≥ 2 Tahun:**
     
-    **Persiapan:**
-    - Gunakan microtoise atau stadiometer
-    - Lepaskan sepatu, topi, dan aksesoris rambut
-    - Butuh 1-2 orang (tergantung kooperatif tidaknya anak)
+    # **Persiapan:**
+    # - Gunakan microtoise atau stadiometer
+    # - Lepaskan sepatu, topi, dan aksesoris rambut
+    # - Butuh 1-2 orang (tergantung kooperatif tidaknya anak)
     
-    **Langkah-langkah:**
-    1. Pasang microtoise di dinding yang rata dan tegak lurus
-    2. Anak berdiri tegak membelakangi dinding/microtoise:
-       - **Tumit:** menempel dinding, kedua kaki rapat
-       - **Bokong:** menempel dinding
-       - **Bahu:** menempel dinding (punggung lurus)
-       - **Kepala bagian belakang:** menempel dinding
-    3. Posisi kepala tegak lurus:
-       - Pandangan lurus ke depan
-       - Garis dari lubang telinga ke mata harus horizontal (Frankfurt plane)
-       - Dagu tidak boleh mendongak atau menunduk
-    4. Kedua tangan lurus di samping badan, rileks
-    5. Tarik napas dalam, berdiri setegak mungkin
-    6. Turunkan headpiece (bagian atas pengukur) hingga menempel di puncak kepala (ubun-ubun)
-    7. Pastikan headpiece tegak lurus, tidak miring
-    8. Baca angka pada jendela baca microtoise
-    9. Catat hasil dalam sentimeter (cm) dengan 1 desimal
+    # **Langkah-langkah:**
+    # 1. Pasang microtoise di dinding yang rata dan tegak lurus
+    # 2. Anak berdiri tegak membelakangi dinding/microtoise:
+    #    - **Tumit:** menempel dinding, kedua kaki rapat
+    #    - **Bokong:** menempel dinding
+    #    - **Bahu:** menempel dinding (punggung lurus)
+    #    - **Kepala bagian belakang:** menempel dinding
+    # 3. Posisi kepala tegak lurus:
+    #    - Pandangan lurus ke depan
+    #    - Garis dari lubang telinga ke mata harus horizontal (Frankfurt plane)
+    #    - Dagu tidak boleh mendongak atau menunduk
+    # 4. Kedua tangan lurus di samping badan, rileks
+    # 5. Tarik napas dalam, berdiri setegak mungkin
+    # 6. Turunkan headpiece (bagian atas pengukur) hingga menempel di puncak kepala (ubun-ubun)
+    # 7. Pastikan headpiece tegak lurus, tidak miring
+    # 8. Baca angka pada jendela baca microtoise
+    # 9. Catat hasil dalam sentimeter (cm) dengan 1 desimal
     
-    **Contoh:** 95.2 cm, 108.7 cm
+    # **Contoh:** 95.2 cm, 108.7 cm
     
-    **Hal Penting:**
-    - **Konversi:** Jika anak < 2 tahun diukur berdiri, TAMBAHKAN 0.7 cm pada hasil
-    - **Konversi:** Jika anak ≥ 2 tahun diukur berbaring, KURANGI 0.7 cm pada hasil
-    - Ukur minimal 2 kali untuk memastikan akurasi
-    - Jika hasil berbeda > 0.5 cm, ukur kembali
-    - Anak harus dalam kondisi tenang dan kooperatif
-    - Jangan mengukur dengan rambut dikuncir tinggi atau memakai topi
+    # **Hal Penting:**
+    # - **Konversi:** Jika anak < 2 tahun diukur berdiri, TAMBAHKAN 0.7 cm pada hasil
+    # - **Konversi:** Jika anak ≥ 2 tahun diukur berbaring, KURANGI 0.7 cm pada hasil
+    # - Ukur minimal 2 kali untuk memastikan akurasi
+    # - Jika hasil berbeda > 0.5 cm, ukur kembali
+    # - Anak harus dalam kondisi tenang dan kooperatif
+    # - Jangan mengukur dengan rambut dikuncir tinggi atau memakai topi
     
-    **Tips untuk Kader:**
-    - Ajak anak bicara agar tenang dan mau bekerjasama
-    - Pastikan anak tidak jinjit atau menekuk lutut
-    - Gunakan mainan atau nyanyian untuk mengalihkan perhatian bayi
-    - Catat hasil segera di Buku KIA dan KMS
-    """)
+    # **Tips untuk Kader:**
+    # - Ajak anak bicara agar tenang dan mau bekerjasama
+    # - Pastikan anak tidak jinjit atau menekuk lutut
+    # - Gunakan mainan atau nyanyian untuk mengalihkan perhatian bayi
+    # - Catat hasil segera di Buku KIA dan KMS
+    # """)
     
-    st.markdown("---")
+    #st.markdown("---")
     
     # 3. Lingkar Kepala
-    st.header("3️⃣ Pengukuran Lingkar Kepala (Head Circumference)")
-    st.markdown("""
-    **Alat yang digunakan:**
-    - Pita pengukur (meteran) yang fleksibel, tidak elastis/tidak mudah melar
-    - Pita harus memiliki skala dalam sentimeter (cm) dengan ketelitian milimeter (mm)
+    # st.header("3️⃣ Pengukuran Lingkar Kepala (Head Circumference)")
+    # st.markdown("""
+    # **Alat yang digunakan:**
+    # - Pita pengukur (meteran) yang fleksibel, tidak elastis/tidak mudah melar
+    # - Pita harus memiliki skala dalam sentimeter (cm) dengan ketelitian milimeter (mm)
     
-    **Fungsi Pengukuran Lingkar Kepala:**
-    - Mendeteksi kelainan pertumbuhan otak (mikrosefali atau makrosefali)
-    - Indikator penting perkembangan otak bayi dan balita
-    - Wajib diukur terutama pada anak usia 0-24 bulan
+    # **Fungsi Pengukuran Lingkar Kepala:**
+    # - Mendeteksi kelainan pertumbuhan otak (mikrosefali atau makrosefali)
+    # - Indikator penting perkembangan otak bayi dan balita
+    # - Wajib diukur terutama pada anak usia 0-24 bulan
     
-    **Prosedur Pengukuran:**
+    # **Prosedur Pengukuran:**
     
-    **Persiapan:**
-    - Lepaskan topi, bandana, atau aksesoris kepala
-    - Buka kunciran/jepit rambut yang tebal
-    - Anak dalam posisi duduk atau berbaring dengan tenang
-    - Butuh 1-2 orang (tergantung umur anak)
+    # **Persiapan:**
+    # - Lepaskan topi, bandana, atau aksesoris kepala
+    # - Buka kunciran/jepit rambut yang tebal
+    # - Anak dalam posisi duduk atau berbaring dengan tenang
+    # - Butuh 1-2 orang (tergantung umur anak)
     
-    **Langkah-langkah:**
-    1. **Tentukan titik pengukuran yang benar:**
-       - **Bagian Belakang:** Cari bagian kepala belakang yang paling menonjol (protuberantia occipitalis/prominens occipital)
-       - **Bagian Depan:** Cari bagian dahi yang paling menonjol, tepat di atas alis mata (glabella/supraorbital ridge)
+    # **Langkah-langkah:**
+    # 1. **Tentukan titik pengukuran yang benar:**
+    #    - **Bagian Belakang:** Cari bagian kepala belakang yang paling menonjol (protuberantia occipitalis/prominens occipital)
+    #    - **Bagian Depan:** Cari bagian dahi yang paling menonjol, tepat di atas alis mata (glabella/supraorbital ridge)
     
-    2. **Melingkarkan pita pengukur:**
-       - Letakkan pita di bagian belakang kepala (prominens occipital)
-       - Tarik pita melingkar ke depan melewati kedua sisi kepala
-       - Pita harus melewati bagian atas telinga (bukan menutupi telinga)
-       - Tarik pita hingga melingkar di dahi (bagian paling menonjol di atas alis)
+    # 2. **Melingkarkan pita pengukur:**
+    #    - Letakkan pita di bagian belakang kepala (prominens occipital)
+    #    - Tarik pita melingkar ke depan melewati kedua sisi kepala
+    #    - Pita harus melewati bagian atas telinga (bukan menutupi telinga)
+    #    - Tarik pita hingga melingkar di dahi (bagian paling menonjol di atas alis)
     
-    3. **Pastikan posisi pita benar:**
-       - Pita harus horizontal (sejajar lantai), tidak miring
-       - Pita tidak terlalu ketat hingga menekan kulit kepala
-       - Pita tidak terlalu longgar
-       - Pita melingkar di bagian kepala yang TERLEBAR
+    # 3. **Pastikan posisi pita benar:**
+    #    - Pita harus horizontal (sejajar lantai), tidak miring
+    #    - Pita tidak terlalu ketat hingga menekan kulit kepala
+    #    - Pita tidak terlalu longgar
+    #    - Pita melingkar di bagian kepala yang TERLEBAR
     
-    4. **Membaca hasil:**
-       - Tarik pita dengan tekanan yang cukup (tidak terlalu kencang/longgar)
-       - Baca angka pada pita di titik pertemuan (angka 0 bertemu dengan angka hasil)
-       - Baca hasil dalam sentimeter (cm) dengan 1 desimal
+    # 4. **Membaca hasil:**
+    #    - Tarik pita dengan tekanan yang cukup (tidak terlalu kencang/longgar)
+    #    - Baca angka pada pita di titik pertemuan (angka 0 bertemu dengan angka hasil)
+    #    - Baca hasil dalam sentimeter (cm) dengan 1 desimal
     
-    5. **Pencatatan:**
-       - Catat hasil pengukuran segera
-       - Contoh: 42.5 cm, 48.3 cm
+    # 5. **Pencatatan:**
+    #    - Catat hasil pengukuran segera
+    #    - Contoh: 42.5 cm, 48.3 cm
     
-    **Tips Penting:**
-    - Ukur lingkar kepala minimal 2-3 kali untuk memastikan konsistensi
-    - Jika hasil berbeda > 0.2 cm, ulangi pengukuran
-    - Jangan mengukur saat anak menangis keras (dapat menyebabkan pembengkakan sementara)
-    - Rambut yang tebal tidak mempengaruhi hasil (pita akan menekan rambut)
-    - Pastikan pita melingkar di bagian TERLEBAR kepala untuk hasil akurat
-    - Hindari mengukur tepat setelah anak tidur (kepala mungkin sedikit gepeng)
+    # **Tips Penting:**
+    # - Ukur lingkar kepala minimal 2-3 kali untuk memastikan konsistensi
+    # - Jika hasil berbeda > 0.2 cm, ulangi pengukuran
+    # - Jangan mengukur saat anak menangis keras (dapat menyebabkan pembengkakan sementara)
+    # - Rambut yang tebal tidak mempengaruhi hasil (pita akan menekan rambut)
+    # - Pastikan pita melingkar di bagian TERLEBAR kepala untuk hasil akurat
+    # - Hindari mengukur tepat setelah anak tidur (kepala mungkin sedikit gepeng)
     
-    **Perhatian Khusus:**
-    - Jika lingkar kepala terlalu kecil (mikrosefali) atau terlalu besar (makrosefali), segera rujuk ke tenaga kesehatan
-    - Lingkar kepala yang tidak normal bisa mengindikasikan masalah perkembangan otak
-    - Catat hasil di Buku KIA dan laporkan ke petugas kesehatan jika ada kelainan
-    """)
+    # **Perhatian Khusus:**
+    # - Jika lingkar kepala terlalu kecil (mikrosefali) atau terlalu besar (makrosefali), segera rujuk ke tenaga kesehatan
+    # - Lingkar kepala yang tidak normal bisa mengindikasikan masalah perkembangan otak
+    # - Catat hasil di Buku KIA dan laporkan ke petugas kesehatan jika ada kelainan
+    # """)
     
-    st.markdown("---")
+    # st.markdown("---")
     
-    # Hal Penting
-    st.header("⚠️ Hal-Hal Penting dalam Pengukuran Antropometri")
-    st.markdown("""
-    ### 📋 Persiapan Sebelum Pengukuran:
-    1. **Kalibrasi Alat:**
-       - Pastikan semua alat ukur (timbangan, microtoise, pita ukur) sudah dikalibrasi
-       - Cek timbangan dengan beban standar secara berkala
-       - Periksa kondisi alat sebelum digunakan (tidak rusak, tidak berkarat)
+    # # Hal Penting
+    # st.header("⚠️ Hal-Hal Penting dalam Pengukuran Antropometri")
+    # st.markdown("""
+    # ### 📋 Persiapan Sebelum Pengukuran:
+    # 1. **Kalibrasi Alat:**
+    #    - Pastikan semua alat ukur (timbangan, microtoise, pita ukur) sudah dikalibrasi
+    #    - Cek timbangan dengan beban standar secara berkala
+    #    - Periksa kondisi alat sebelum digunakan (tidak rusak, tidak berkarat)
     
-    2. **Kondisi Anak:**
-       - Anak dalam keadaan tenang, tidak menangis atau rewel
-       - Sebaiknya tidak baru selesai makan/minum (untuk penimbangan)
-       - Tidak demam atau sakit
-       - Kandung kemih sudah dikosongkan (buang air kecil dulu)
+    # 2. **Kondisi Anak:**
+    #    - Anak dalam keadaan tenang, tidak menangis atau rewel
+    #    - Sebaiknya tidak baru selesai makan/minum (untuk penimbangan)
+    #    - Tidak demam atau sakit
+    #    - Kandung kemih sudah dikosongkan (buang air kecil dulu)
     
-    3. **Waktu Pengukuran:**
-       - Lakukan pengukuran pada waktu yang sama setiap bulan
-       - Pagi hari lebih disarankan (kondisi anak lebih stabil)
-       - Untuk monitoring rutin, gunakan hari yang sama setiap bulan (misal: setiap tanggal 25)
+    # 3. **Waktu Pengukuran:**
+    #    - Lakukan pengukuran pada waktu yang sama setiap bulan
+    #    - Pagi hari lebih disarankan (kondisi anak lebih stabil)
+    #    - Untuk monitoring rutin, gunakan hari yang sama setiap bulan (misal: setiap tanggal 25)
     
-    ### ✅ Ketelitian dan Akurasi:
-    1. **Pencatatan Hasil:**
-       - Semua hasil HARUS dicatat dengan **1 desimal**
-       - Contoh BENAR: 10.5 kg, 75.3 cm, 45.2 cm
-       - Contoh SALAH: 10 kg, 75 cm (tanpa desimal)
+    # ### ✅ Ketelitian dan Akurasi:
+    # 1. **Pencatatan Hasil:**
+    #    - Semua hasil HARUS dicatat dengan **1 desimal**
+    #    - Contoh BENAR: 10.5 kg, 75.3 cm, 45.2 cm
+    #    - Contoh SALAH: 10 kg, 75 cm (tanpa desimal)
     
-    2. **Pengulangan Pengukuran:**
-       - Lakukan pengukuran minimal **2 kali** untuk setiap parameter
-       - Jika selisih hasil:
-         * Berat badan: > 0.1 kg → ukur lagi
-         * Panjang/Tinggi: > 0.5 cm → ukur lagi
-         * Lingkar kepala: > 0.2 cm → ukur lagi
-       - Ambil nilai rata-rata jika kedua hasil mirip
+    # 2. **Pengulangan Pengukuran:**
+    #    - Lakukan pengukuran minimal **2 kali** untuk setiap parameter
+    #    - Jika selisih hasil:
+    #      * Berat badan: > 0.1 kg → ukur lagi
+    #      * Panjang/Tinggi: > 0.5 cm → ukur lagi
+    #      * Lingkar kepala: > 0.2 cm → ukur lagi
+    #    - Ambil nilai rata-rata jika kedua hasil mirip
     
-    3. **Posisi Pengukuran:**
-       - Anak < 2 tahun (< 85 cm): ukur PANJANG badan (berbaring)
-       - Anak ≥ 2 tahun (≥ 85 cm): ukur TINGGI badan (berdiri)
-       - Jika salah posisi, gunakan KONVERSI: tambah/kurang 0.7 cm
+    # 3. **Posisi Pengukuran:**
+    #    - Anak < 2 tahun (< 85 cm): ukur PANJANG badan (berbaring)
+    #    - Anak ≥ 2 tahun (≥ 85 cm): ukur TINGGI badan (berdiri)
+    #    - Jika salah posisi, gunakan KONVERSI: tambah/kurang 0.7 cm
     
-    ### 📝 Dokumentasi dan Pencatatan:
-    1. **Catat Segera di:**
-       - Buku KIA (Kesehatan Ibu dan Anak)
-       - Kartu Menuju Sehat (KMS)
-       - Register Kohort Balita
-       - Formulir skrining/laporan posyandu
+    # ### 📝 Dokumentasi dan Pencatatan:
+    # 1. **Catat Segera di:**
+    #    - Buku KIA (Kesehatan Ibu dan Anak)
+    #    - Kartu Menuju Sehat (KMS)
+    #    - Register Kohort Balita
+    #    - Formulir skrining/laporan posyandu
     
-    2. **Informasi yang Harus Dicatat:**
-       - Tanggal pengukuran
-       - Nama lengkap anak
-       - Usia anak (dalam bulan)
-       - Hasil pengukuran: BB, TB/PB, LK
-       - Nama pengukur/kader
-       - Kondisi khusus (jika ada)
+    # 2. **Informasi yang Harus Dicatat:**
+    #    - Tanggal pengukuran
+    #    - Nama lengkap anak
+    #    - Usia anak (dalam bulan)
+    #    - Hasil pengukuran: BB, TB/PB, LK
+    #    - Nama pengukur/kader
+    #    - Kondisi khusus (jika ada)
     
-    3. **Plot di Grafik KMS:**
-       - Tandai hasil pengukuran berat dan tinggi badan di grafik KMS
-       - Hubungkan titik dengan titik pengukuran sebelumnya
-       - Lihat apakah garis pertumbuhan naik, mendatar, atau turun
+    # 3. **Plot di Grafik KMS:**
+    #    - Tandai hasil pengukuran berat dan tinggi badan di grafik KMS
+    #    - Hubungkan titik dengan titik pengukuran sebelumnya
+    #    - Lihat apakah garis pertumbuhan naik, mendatar, atau turun
     
-    ### 🔍 Interpretasi Hasil:
-    1. **Waspada jika:**
-       - Garis pertumbuhan mendatar atau turun
-       - Berat badan tidak naik 2 bulan berturut-turut
-       - Tinggi badan jauh di bawah garis normal
-       - Lingkar kepala terlalu kecil atau terlalu besar
+    # ### 🔍 Interpretasi Hasil:
+    # 1. **Waspada jika:**
+    #    - Garis pertumbuhan mendatar atau turun
+    #    - Berat badan tidak naik 2 bulan berturut-turut
+    #    - Tinggi badan jauh di bawah garis normal
+    #    - Lingkar kepala terlalu kecil atau terlalu besar
     
-    2. **Tindak Lanjut:**
-       - Jika ditemukan masalah, segera rujuk ke Puskesmas/tenaga kesehatan
-       - Konseling gizi untuk orang tua
-       - Pemantauan lebih intensif (misalnya setiap 2 minggu)
+    # 2. **Tindak Lanjut:**
+    #    - Jika ditemukan masalah, segera rujuk ke Puskesmas/tenaga kesehatan
+    #    - Konseling gizi untuk orang tua
+    #    - Pemantauan lebih intensif (misalnya setiap 2 minggu)
     
-    ### 🛡️ Privasi dan Etika:
-    - Jaga privasi anak dan keluarga
-    - Ukur di tempat yang nyaman dan tidak terlalu ramai
-    - Hormati anak, jangan memaksa jika anak sangat rewel
-    - Berikan penjelasan hasil kepada orang tua dengan bahasa yang mudah dipahami
-    - Jangan membuat orang tua panik, berikan informasi dengan bijak
+    # ### 🛡️ Privasi dan Etika:
+    # - Jaga privasi anak dan keluarga
+    # - Ukur di tempat yang nyaman dan tidak terlalu ramai
+    # - Hormati anak, jangan memaksa jika anak sangat rewel
+    # - Berikan penjelasan hasil kepada orang tua dengan bahasa yang mudah dipahami
+    # - Jangan membuat orang tua panik, berikan informasi dengan bijak
     
-    ### 📞 Kapan Harus Merujuk ke Tenaga Kesehatan:
-    - Berat badan sangat kurang (di bawah garis merah KMS)
-    - Tinggi badan sangat pendek untuk usianya
-    - Lingkar kepala terlalu kecil (mikrosefali) atau terlalu besar (makrosefali)
-    - Gizi buruk atau obesitas
-    - Bengkak pada kedua kaki (edema)
-    - Tidak ada kenaikan berat badan 2-3 bulan berturut-turut
-    """)
+    # ### 📞 Kapan Harus Merujuk ke Tenaga Kesehatan:
+    # - Berat badan sangat kurang (di bawah garis merah KMS)
+    # - Tinggi badan sangat pendek untuk usianya
+    # - Lingkar kepala terlalu kecil (mikrosefali) atau terlalu besar (makrosefali)
+    # - Gizi buruk atau obesitas
+    # - Bengkak pada kedua kaki (edema)
+    # - Tidak ada kenaikan berat badan 2-3 bulan berturut-turut
+    # """)
     
-    st.markdown("---")
+    # st.markdown("---")
     
-    st.success("""
-    ### 💡 Pesan untuk Kader Posyandu:
+    # st.success("""
+    # ### 💡 Pesan untuk Kader Posyandu:
     
-    Pengukuran antropometri yang **akurat** dan **teliti** sangat penting untuk:
-    - Mendeteksi dini masalah pertumbuhan anak
-    - Mencegah stunting dan malnutrisi
-    - Memantau efektivitas program gizi
-    - Memberikan intervensi yang tepat waktu
+    # Pengukuran antropometri yang **akurat** dan **teliti** sangat penting untuk:
+    # - Mendeteksi dini masalah pertumbuhan anak
+    # - Mencegah stunting dan malnutrisi
+    # - Memantau efektivitas program gizi
+    # - Memberikan intervensi yang tepat waktu
     
-    **Peran kader sangat penting** dalam membantu menciptakan generasi Indonesia yang sehat, cerdas, dan bebas stunting!
-    """)
+    # **Peran kader sangat penting** dalam membantu menciptakan generasi Indonesia yang sehat, cerdas, dan bebas stunting!
+    # """)
     
-    st.info("📚 **Referensi:** Booklet Petunjuk Teknis Pengukuran Antropometri Dan Pencatatan Hasil Antropometri Dalam Buku KIA Bagi Kader - Kementerian Kesehatan RI")
+    # st.info("📚 **Referensi:** Booklet Petunjuk Teknis Pengukuran Antropometri Dan Pencatatan Hasil Antropometri Dalam Buku KIA Bagi Kader - Kementerian Kesehatan RI")
         
-    st.caption("⚕️ Jika ragu atau menemukan kelainan, segera konsultasikan dengan bidan, perawat, atau dokter di Puskesmas terdekat.")
+    # st.caption("⚕️ Jika ragu atau menemukan kelainan, segera konsultasikan dengan bidan, perawat, atau dokter di Puskesmas terdekat.")
 
 # ========= SKRINING GIZI PAGE
 elif page == "🏠 Skrining Gizi":
