@@ -935,7 +935,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
 
 # ========= CARA PENGUKURAN PAGE
 elif page == "📏 Cara Pengukuran":
-    st.image("header situmbuh.png", width=400)
+    # st.image("header situmbuh.png", width=400)
     st.title("📏 Panduan Cara Pengukuran Antropometri Anak")
     st.info("📚 **Referensi:** Akun Youtube @direktoratYanKesga")
     st.video('https://youtu.be/D-_JimQkBuA?si=Un2gdqlYUfy1fTQ6')
