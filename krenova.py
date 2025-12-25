@@ -356,7 +356,7 @@ def stunting_risk_percent(hfa, wfa):
 
 
 ## ========= STREAMLIT
-st.set_page_config(page_title="Si Tumbuh - Sistem Informasi Tumbuh Kembang Anak", page_icon="👶", layout="wide")
+st.set_page_config(page_title="Si Tumbuh")
 
 # Custom CSS untuk mempercantik
 st.markdown("""
@@ -565,7 +565,7 @@ if st.session_state.view_mode == 'public':
     # Mode Publik - Tampilkan header dengan tombol login admin
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.markdown(f"<h1 class='main-header'>👶 Si Tumbuh - Sistem Informasi Tumbuh Kembang Anak</h1>", unsafe_allow_html=True)
+        st.markdown(f"<h1 class='main-header'>👶 Si Tumbuh</h1>", unsafe_allow_html=True)
         st.markdown("<p class='sub-header'>Berdasarkan Standar WHO</p>", unsafe_allow_html=True)
     with col2:
         st.write("")
@@ -934,9 +934,8 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
 
 # ========= CARA PENGUKURAN PAGE
 elif page == "📏 Cara Pengukuran":
-    st.image("image.jpg", caption="Anak Sehat Indonesia", width=400)
+    st.image("header situmbuh.png", caption="Anak Sehat Indonesia", width=400)
     st.title("📏 Panduan Cara Pengukuran Antropometri Anak")
-    st.write("Panduan pengukuran antropometri untuk kader posyandu berdasarkan standar WHO dan Kemenkes RI")
     st.info("📚 **Referensi:** Akun Youtube @direktoratYanKesga")
     st.video('https://youtu.be/D-_JimQkBuA?si=Un2gdqlYUfy1fTQ6')
     st.markdown("---")
@@ -1227,11 +1226,11 @@ elif page == "📏 Cara Pengukuran":
 elif page == "🏠 Skrining Gizi":
     col1, col2 = st.columns([2, 1])
     with col1:
-        st.title("📋 Form Skrining - Si Tumbuh")
+        st.title("📋 Skrining - Si Tumbuh")
         st.markdown("Silakan masukkan hasil pengukuran yang telah dilakukan dengan tepat!")
     with col2:
         try:
-            st.image("image.jpg", width=250)
+            st.image("header situmbuh.png", width=250)
         except:
             pass
     
