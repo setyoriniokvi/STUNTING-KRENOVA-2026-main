@@ -356,7 +356,7 @@ def stunting_risk_percent(hfa, wfa):
 
 
 ## ========= STREAMLIT
-st.set_page_config(page_title="Si Tumbuh")
+st.set_page_config(page_title="SI Tumbuh")
 
 # Custom CSS untuk mempercantik
 st.markdown("""
@@ -565,8 +565,9 @@ if st.session_state.view_mode == 'public':
     # Mode Publik - Tampilkan header dengan tombol login admin
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.markdown(f"<h1 class='main-header'>👶 Si Tumbuh</h1>", unsafe_allow_html=True)
-        st.markdown("<p class='sub-header'>Berdasarkan Standar WHO</p>", unsafe_allow_html=True)
+        st.image("header situmbuh.png")
+        # st.markdown(f"<h1 class='main-header'>👶 SI Tumbuh</h1>", unsafe_allow_html=True)
+        # st.markdown("<p class='sub-header'>Berdasarkan Standar WHO</p>", unsafe_allow_html=True)
     with col2:
         st.write("")
         st.write("")
@@ -577,7 +578,7 @@ else:
     # Mode Admin - Tampilkan header dengan info user
     col1, col2, col3 = st.columns([3, 1, 1])
     with col1:
-        st.markdown(f"<h1 class='main-header'>👶 Si Tumbuh</h1>", unsafe_allow_html=True)
+        st.markdown(f"<h1 class='main-header'>👶 SI Tumbuh</h1>", unsafe_allow_html=True)
     with col2:
         st.write(f"**{st.session_state.nama_lengkap}**")
         st.caption(f"Role: {st.session_state.role.upper()}")
@@ -934,7 +935,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
 
 # ========= CARA PENGUKURAN PAGE
 elif page == "📏 Cara Pengukuran":
-    st.image("header situmbuh.png", caption="Anak Sehat Indonesia", width=250)
+    st.image("header situmbuh.png", width=400)
     st.title("📏 Panduan Cara Pengukuran Antropometri Anak")
     st.info("📚 **Referensi:** Akun Youtube @direktoratYanKesga")
     st.video('https://youtu.be/D-_JimQkBuA?si=Un2gdqlYUfy1fTQ6')
@@ -1226,7 +1227,7 @@ elif page == "📏 Cara Pengukuran":
 elif page == "🏠 Skrining Gizi":
     col1, col2 = st.columns([2, 1])
     with col1:
-        st.title("📋 Skrining - Si Tumbuh")
+        st.title("📋 Skrining - SI Tumbuh")
         st.markdown("Silakan masukkan hasil pengukuran yang telah dilakukan dengan tepat!")
     with col2:
         try:
