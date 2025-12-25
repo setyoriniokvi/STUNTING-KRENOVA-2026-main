@@ -934,7 +934,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
 
 # ========= CARA PENGUKURAN PAGE
 elif page == "📏 Cara Pengukuran":
-    st.image("header situmbuh.png", caption="Anak Sehat Indonesia", width=400)
+    st.image("header situmbuh.png", caption="Anak Sehat Indonesia", width=1600)
     st.title("📏 Panduan Cara Pengukuran Antropometri Anak")
     st.info("📚 **Referensi:** Akun Youtube @direktoratYanKesga")
     st.video('https://youtu.be/D-_JimQkBuA?si=Un2gdqlYUfy1fTQ6')
@@ -1230,7 +1230,7 @@ elif page == "🏠 Skrining Gizi":
         st.markdown("Silakan masukkan hasil pengukuran yang telah dilakukan dengan tepat!")
     with col2:
         try:
-            st.image("header situmbuh.png", width=250)
+            st.image("header situmbuh.png", width=1600)
         except:
             pass
     
