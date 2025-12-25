@@ -69,7 +69,7 @@ def get_ai_analysis(data_anak, status_z):
 
 # ========= DATABASE SETUP
 def init_database():
-    conn = sqlite3.connect('.secret/krenova_data.db')
+    conn = sqlite3.connect('/tmp/krenova_data.db')
     c = conn.cursor()
     
     # Tabel Users
