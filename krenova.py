@@ -247,7 +247,13 @@ def calc_hfa(age, sex, height):
 ## BB Terhadap Panjang/Tinggi Badan
 def calc_wfh(age, sex, weight, body_cm):
     # Tentukan tipe pengukuran berdasarkan usia
-    m_type = "Length" if age <= 24 else "Height"
+    # m_type = "Length" if age < 24 == "Height" elif == 24 else "Height"
+    if age < 24:
+        m_type = "Length"
+    elif age == 24:
+        m_type = "Height"
+    else:
+        m_type = "Height"
 
     # Filter data WHO sesuai kolom dataset kamu
     ref = wfh[
