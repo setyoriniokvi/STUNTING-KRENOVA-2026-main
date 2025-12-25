@@ -641,7 +641,7 @@ if st.session_state.view_mode == 'public':
 else:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
 
-menu_options = ["🏠 Skrining Gizi", "📏 Cara Pengukuran"]
+menu_options = ["🏠 Skrining Balita", "📏 Cara Pengukuran"]
 if st.session_state.view_mode == 'admin' and st.session_state.role == 'admin':
     menu_options.append("📊 Database (Admin)")
     
@@ -1228,7 +1228,7 @@ elif page == "📏 Cara Pengukuran":
 elif page == "🏠 Skrining Gizi":
     col1, col2 = st.columns([2, 1])
     with col1:
-        st.title("📋 Skrining - SI Tumbuh")
+        st.title("📋 Skrining Pertumbuhan & Status Gizi Anak")
         st.markdown("Silakan masukkan hasil pengukuran yang telah dilakukan dengan tepat!")
     # with col2:
     #     try:
@@ -1242,7 +1242,7 @@ elif page == "🏠 Skrining Gizi":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("📝 Data Anak")
+        st.subheader("📝 Data Balita")
         date = st.date_input("Tanggal Pengukuran", value=None)
         name = st.text_input("Nama Anak", placeholder="Masukkan nama lengkap anak")
         alamat = st.text_input("Alamat/Desa", placeholder="Contoh: Desa Slogo, Kec. Tanon")
