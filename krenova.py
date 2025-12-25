@@ -69,7 +69,7 @@ def get_ai_analysis(data_anak, status_z):
 
 # ========= DATABASE SETUP
 def init_database():
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('.secret/krenova_data.db')
     c = conn.cursor()
     
     # Tabel Users
@@ -126,7 +126,7 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def verify_login(username, password):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('.secret/krenova_data.db')
     c = conn.cursor()
     hashed_pw = hash_password(password)
     c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, hashed_pw))
@@ -135,7 +135,7 @@ def verify_login(username, password):
     return user
 
 def save_measurement(data, z_scores, statuses, risk, status_stunting, username):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('.secret/krenova_data.db')
     c = conn.cursor()
     c.execute('''INSERT INTO measurements 
                  (tanggal_pengukuran, nama_anak, usia_bulan, gender, alamat, berat_badan, tinggi_badan, 
@@ -150,13 +150,13 @@ def save_measurement(data, z_scores, statuses, risk, status_stunting, username):
     conn.close()
 
 def get_all_measurements():
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('.secret/krenova_data.db')
     df = pd.read_sql_query("SELECT * FROM measurements ORDER BY created_at DESC", conn)
     conn.close()
     return df
 
 def update_measurement(record_id, data, z_scores, statuses, risk, status_stunting):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('.secret/krenova_data.db')
     c = conn.cursor()
     c.execute('''UPDATE measurements 
                  SET tanggal_pengukuran=?, nama_anak=?, usia_bulan=?, gender=?, alamat=?, 
@@ -174,14 +174,14 @@ def update_measurement(record_id, data, z_scores, statuses, risk, status_stuntin
     conn.close()
 
 def delete_measurement(record_id):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('.secret/krenova_data.db')
     c = conn.cursor()
     c.execute('DELETE FROM measurements WHERE id=?', (record_id,))
     conn.commit()
     conn.close()
 
 def get_measurement_by_id(record_id):
-    conn = sqlite3.connect('/krenova_data.db')
+    conn = sqlite3.connect('.secret/krenova_data.db')
     c = conn.cursor()
     c.execute('SELECT * FROM measurements WHERE id=?', (record_id,))
     result = c.fetchone()
@@ -498,8 +498,6 @@ st.markdown("""
         font-size: 1.15rem !important;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
         margin-bottom: 0.4rem !important;
-        letter-spacing: 0.3px;
-    }
     .stTextInput > label > div,
     .stNumberInput > label > div,
     .stDateInput > label > div,
@@ -523,7 +521,7 @@ st.markdown("""
     
     /* Info boxes */
     .stAlert {
-        background-color: #FFFFFF !important;
+        background-color: #FFF9E6 !important;
         border: 3px solid #8AA624 !important;
         border-radius: 10px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -535,7 +533,7 @@ st.markdown("""
     
     /* Expander styling */
     .streamlit-expanderHeader {
-        background-color: #FFFFFF !important;
+        background-color: #FFF9E6 !important;
         border: 3px solid #8AA624 !important;
         border-radius: 10px !important;
         font-weight: 700 !important;
@@ -641,7 +639,7 @@ if st.session_state.view_mode == 'public':
 else:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
 
-menu_options = ["🏠 Skrining Balita", "📏 Cara Pengukuran"]
+menu_options = ["🏠 Skrining Balita", "📏 Cara Pengukuran", "👤 Profile"]
 if st.session_state.view_mode == 'admin' and st.session_state.role == 'admin':
     menu_options.append("📊 Database (Admin)")
     
@@ -941,300 +939,13 @@ elif page == "📏 Cara Pengukuran":
     st.info("📚 **Referensi:** Akun Youtube @direktoratYanKesga")
     st.video('https://youtu.be/D-_JimQkBuA?si=Un2gdqlYUfy1fTQ6')
     st.markdown("---")
-    
-    # 1. Berat Badan
-    # st.header("1️⃣ Pengukuran Berat Badan")
-    # st.markdown("""
-    # **Alat yang digunakan:**
-    # - Timbangan digital bayi (untuk anak < 2 tahun)
-    # - Timbangan digital anak (untuk anak ≥ 2 tahun)
-    # - Timbangan dacin (alternatif di posyandu)
-    
-    # **Prosedur Pengukuran:**
-    
-    # **A. Untuk Bayi/Balita dengan Timbangan Digital:**
-    # 1. Nyalakan timbangan dan pastikan menunjukkan angka 0 (nol)
-    # 2. Lepaskan pakaian bayi/balita, biarkan hanya memakai popok atau celana dalam
-    # 3. Letakkan bayi/balita di tengah-tengah timbangan dengan hati-hati
-    # 4. Pastikan seluruh tubuh bayi/balita berada di atas timbangan
-    # 5. Tunggu hingga angka pada layar stabil (tidak berubah-ubah)
-    # 6. Baca dan catat hasil timbangan dalam kilogram (kg) dengan 1 desimal
-    # 7. Contoh pencatatan: 8.5 kg, 12.3 kg
-    
-    # **B. Untuk Balita dengan Timbangan Dacin:**
-    # 1. Gantungkan dacin pada tempat yang kuat dan stabil
-    # 2. Pastikan dacin dalam posisi seimbang (bandul geser di angka 0)
-    # 3. Pasang celana timbang atau sarung timbang
-    # 4. Masukkan anak ke dalam celana/sarung timbang
-    # 5. Geser bandul hingga dacin seimbang (batang dacin horizontal)
-    # 6. Baca angka pada skala dacin
-    # 7. Catat berat badan dalam kilogram
-    
-    # **Tips Penting:**
-    # - Timbang anak pada waktu yang sama setiap bulan (pagi hari lebih baik)
-    # - Pastikan timbangan sudah dikalibrasi dan akurat
-    # - Anak harus dalam kondisi tenang, tidak menangis atau bergerak berlebihan
-    # - Timbang minimal 2 kali untuk memastikan hasil akurat
-    # - Jika hasil berbeda > 0.1 kg, timbang sekali lagi
-    # - Catat hasil segera di Buku KIA dan kartu menuju sehat (KMS)
-    # """)
-    
-    # st.markdown("---")
-    
-    # # 2. Panjang/Tinggi Badan
-    # st.header("2️⃣ Pengukuran Panjang/Tinggi Badan")
-    # st.markdown("""
-    # **Alat yang digunakan:**
-    # - **Infantometer/Length Board** (untuk mengukur panjang badan anak < 2 tahun atau < 85 cm)
-    # - **Microtoise/Stadiometer** (untuk mengukur tinggi badan anak ≥ 2 tahun atau ≥ 85 cm)
-    
-    # **A. Pengukuran Panjang Badan (Posisi Berbaring) - Anak < 2 Tahun:**
-    
-    # **Persiapan:**
-    # - Gunakan papan pengukur (length board/infantometer)
-    # - Butuh 2 orang: 1 pengukur dan 1 pembantu
-    # - Lepaskan sepatu, topi, dan kunciran/jepit rambut anak
-    
-    # **Langkah-langkah:**
-    # 1. Baringkan anak di atas papan pengukur dengan posisi telentang
-    # 2. **Pembantu:** Pegang kepala anak dengan kedua tangan agar:
-    #    - Mahkota kepala (ubun-ubun) menempel pada headboard (papan kepala)
-    #    - Mata anak menghadap lurus ke atas (Frankfurt plane)
-    #    - Bahu menempel rata pada papan pengukur
-    # 3. **Pengukur:** Berdiri di sisi kaki anak:
-    #    - Luruskan kedua kaki anak dengan lembut (jangan dipaksa)
-    #    - Tekan lutut anak agar lurus (tidak bengkok)
-    #    - Kedua telapak kaki tegak lurus (90°) terhadap papan
-    # 4. Geser footboard (papan kaki) hingga menempel kuat pada telapak kaki
-    # 5. Baca angka pada skala di tepi footboard
-    # 6. Catat hasil dalam sentimeter (cm) dengan 1 desimal
-    
-    # **Contoh:** 75.5 cm, 82.3 cm
-    
-    # ---
-    
-    # **B. Pengukuran Tinggi Badan (Posisi Berdiri) - Anak ≥ 2 Tahun:**
-    
-    # **Persiapan:**
-    # - Gunakan microtoise atau stadiometer
-    # - Lepaskan sepatu, topi, dan aksesoris rambut
-    # - Butuh 1-2 orang (tergantung kooperatif tidaknya anak)
-    
-    # **Langkah-langkah:**
-    # 1. Pasang microtoise di dinding yang rata dan tegak lurus
-    # 2. Anak berdiri tegak membelakangi dinding/microtoise:
-    #    - **Tumit:** menempel dinding, kedua kaki rapat
-    #    - **Bokong:** menempel dinding
-    #    - **Bahu:** menempel dinding (punggung lurus)
-    #    - **Kepala bagian belakang:** menempel dinding
-    # 3. Posisi kepala tegak lurus:
-    #    - Pandangan lurus ke depan
-    #    - Garis dari lubang telinga ke mata harus horizontal (Frankfurt plane)
-    #    - Dagu tidak boleh mendongak atau menunduk
-    # 4. Kedua tangan lurus di samping badan, rileks
-    # 5. Tarik napas dalam, berdiri setegak mungkin
-    # 6. Turunkan headpiece (bagian atas pengukur) hingga menempel di puncak kepala (ubun-ubun)
-    # 7. Pastikan headpiece tegak lurus, tidak miring
-    # 8. Baca angka pada jendela baca microtoise
-    # 9. Catat hasil dalam sentimeter (cm) dengan 1 desimal
-    
-    # **Contoh:** 95.2 cm, 108.7 cm
-    
-    # **Hal Penting:**
-    # - **Konversi:** Jika anak < 2 tahun diukur berdiri, TAMBAHKAN 0.7 cm pada hasil
-    # - **Konversi:** Jika anak ≥ 2 tahun diukur berbaring, KURANGI 0.7 cm pada hasil
-    # - Ukur minimal 2 kali untuk memastikan akurasi
-    # - Jika hasil berbeda > 0.5 cm, ukur kembali
-    # - Anak harus dalam kondisi tenang dan kooperatif
-    # - Jangan mengukur dengan rambut dikuncir tinggi atau memakai topi
-    
-    # **Tips untuk Kader:**
-    # - Ajak anak bicara agar tenang dan mau bekerjasama
-    # - Pastikan anak tidak jinjit atau menekuk lutut
-    # - Gunakan mainan atau nyanyian untuk mengalihkan perhatian bayi
-    # - Catat hasil segera di Buku KIA dan KMS
-    # """)
-    
-    #st.markdown("---")
-    
-    # 3. Lingkar Kepala
-    # st.header("3️⃣ Pengukuran Lingkar Kepala (Head Circumference)")
-    # st.markdown("""
-    # **Alat yang digunakan:**
-    # - Pita pengukur (meteran) yang fleksibel, tidak elastis/tidak mudah melar
-    # - Pita harus memiliki skala dalam sentimeter (cm) dengan ketelitian milimeter (mm)
-    
-    # **Fungsi Pengukuran Lingkar Kepala:**
-    # - Mendeteksi kelainan pertumbuhan otak (mikrosefali atau makrosefali)
-    # - Indikator penting perkembangan otak bayi dan balita
-    # - Wajib diukur terutama pada anak usia 0-24 bulan
-    
-    # **Prosedur Pengukuran:**
-    
-    # **Persiapan:**
-    # - Lepaskan topi, bandana, atau aksesoris kepala
-    # - Buka kunciran/jepit rambut yang tebal
-    # - Anak dalam posisi duduk atau berbaring dengan tenang
-    # - Butuh 1-2 orang (tergantung umur anak)
-    
-    # **Langkah-langkah:**
-    # 1. **Tentukan titik pengukuran yang benar:**
-    #    - **Bagian Belakang:** Cari bagian kepala belakang yang paling menonjol (protuberantia occipitalis/prominens occipital)
-    #    - **Bagian Depan:** Cari bagian dahi yang paling menonjol, tepat di atas alis mata (glabella/supraorbital ridge)
-    
-    # 2. **Melingkarkan pita pengukur:**
-    #    - Letakkan pita di bagian belakang kepala (prominens occipital)
-    #    - Tarik pita melingkar ke depan melewati kedua sisi kepala
-    #    - Pita harus melewati bagian atas telinga (bukan menutupi telinga)
-    #    - Tarik pita hingga melingkar di dahi (bagian paling menonjol di atas alis)
-    
-    # 3. **Pastikan posisi pita benar:**
-    #    - Pita harus horizontal (sejajar lantai), tidak miring
-    #    - Pita tidak terlalu ketat hingga menekan kulit kepala
-    #    - Pita tidak terlalu longgar
-    #    - Pita melingkar di bagian kepala yang TERLEBAR
-    
-    # 4. **Membaca hasil:**
-    #    - Tarik pita dengan tekanan yang cukup (tidak terlalu kencang/longgar)
-    #    - Baca angka pada pita di titik pertemuan (angka 0 bertemu dengan angka hasil)
-    #    - Baca hasil dalam sentimeter (cm) dengan 1 desimal
-    
-    # 5. **Pencatatan:**
-    #    - Catat hasil pengukuran segera
-    #    - Contoh: 42.5 cm, 48.3 cm
-    
-    # **Tips Penting:**
-    # - Ukur lingkar kepala minimal 2-3 kali untuk memastikan konsistensi
-    # - Jika hasil berbeda > 0.2 cm, ulangi pengukuran
-    # - Jangan mengukur saat anak menangis keras (dapat menyebabkan pembengkakan sementara)
-    # - Rambut yang tebal tidak mempengaruhi hasil (pita akan menekan rambut)
-    # - Pastikan pita melingkar di bagian TERLEBAR kepala untuk hasil akurat
-    # - Hindari mengukur tepat setelah anak tidur (kepala mungkin sedikit gepeng)
-    
-    # **Perhatian Khusus:**
-    # - Jika lingkar kepala terlalu kecil (mikrosefali) atau terlalu besar (makrosefali), segera rujuk ke tenaga kesehatan
-    # - Lingkar kepala yang tidak normal bisa mengindikasikan masalah perkembangan otak
-    # - Catat hasil di Buku KIA dan laporkan ke petugas kesehatan jika ada kelainan
-    # """)
-    
-    # st.markdown("---")
-    
-    # # Hal Penting
-    # st.header("⚠️ Hal-Hal Penting dalam Pengukuran Antropometri")
-    # st.markdown("""
-    # ### 📋 Persiapan Sebelum Pengukuran:
-    # 1. **Kalibrasi Alat:**
-    #    - Pastikan semua alat ukur (timbangan, microtoise, pita ukur) sudah dikalibrasi
-    #    - Cek timbangan dengan beban standar secara berkala
-    #    - Periksa kondisi alat sebelum digunakan (tidak rusak, tidak berkarat)
-    
-    # 2. **Kondisi Anak:**
-    #    - Anak dalam keadaan tenang, tidak menangis atau rewel
-    #    - Sebaiknya tidak baru selesai makan/minum (untuk penimbangan)
-    #    - Tidak demam atau sakit
-    #    - Kandung kemih sudah dikosongkan (buang air kecil dulu)
-    
-    # 3. **Waktu Pengukuran:**
-    #    - Lakukan pengukuran pada waktu yang sama setiap bulan
-    #    - Pagi hari lebih disarankan (kondisi anak lebih stabil)
-    #    - Untuk monitoring rutin, gunakan hari yang sama setiap bulan (misal: setiap tanggal 25)
-    
-    # ### ✅ Ketelitian dan Akurasi:
-    # 1. **Pencatatan Hasil:**
-    #    - Semua hasil HARUS dicatat dengan **1 desimal**
-    #    - Contoh BENAR: 10.5 kg, 75.3 cm, 45.2 cm
-    #    - Contoh SALAH: 10 kg, 75 cm (tanpa desimal)
-    
-    # 2. **Pengulangan Pengukuran:**
-    #    - Lakukan pengukuran minimal **2 kali** untuk setiap parameter
-    #    - Jika selisih hasil:
-    #      * Berat badan: > 0.1 kg → ukur lagi
-    #      * Panjang/Tinggi: > 0.5 cm → ukur lagi
-    #      * Lingkar kepala: > 0.2 cm → ukur lagi
-    #    - Ambil nilai rata-rata jika kedua hasil mirip
-    
-    # 3. **Posisi Pengukuran:**
-    #    - Anak < 2 tahun (< 85 cm): ukur PANJANG badan (berbaring)
-    #    - Anak ≥ 2 tahun (≥ 85 cm): ukur TINGGI badan (berdiri)
-    #    - Jika salah posisi, gunakan KONVERSI: tambah/kurang 0.7 cm
-    
-    # ### 📝 Dokumentasi dan Pencatatan:
-    # 1. **Catat Segera di:**
-    #    - Buku KIA (Kesehatan Ibu dan Anak)
-    #    - Kartu Menuju Sehat (KMS)
-    #    - Register Kohort Balita
-    #    - Formulir skrining/laporan posyandu
-    
-    # 2. **Informasi yang Harus Dicatat:**
-    #    - Tanggal pengukuran
-    #    - Nama lengkap anak
-    #    - Usia anak (dalam bulan)
-    #    - Hasil pengukuran: BB, TB/PB, LK
-    #    - Nama pengukur/kader
-    #    - Kondisi khusus (jika ada)
-    
-    # 3. **Plot di Grafik KMS:**
-    #    - Tandai hasil pengukuran berat dan tinggi badan di grafik KMS
-    #    - Hubungkan titik dengan titik pengukuran sebelumnya
-    #    - Lihat apakah garis pertumbuhan naik, mendatar, atau turun
-    
-    # ### 🔍 Interpretasi Hasil:
-    # 1. **Waspada jika:**
-    #    - Garis pertumbuhan mendatar atau turun
-    #    - Berat badan tidak naik 2 bulan berturut-turut
-    #    - Tinggi badan jauh di bawah garis normal
-    #    - Lingkar kepala terlalu kecil atau terlalu besar
-    
-    # 2. **Tindak Lanjut:**
-    #    - Jika ditemukan masalah, segera rujuk ke Puskesmas/tenaga kesehatan
-    #    - Konseling gizi untuk orang tua
-    #    - Pemantauan lebih intensif (misalnya setiap 2 minggu)
-    
-    # ### 🛡️ Privasi dan Etika:
-    # - Jaga privasi anak dan keluarga
-    # - Ukur di tempat yang nyaman dan tidak terlalu ramai
-    # - Hormati anak, jangan memaksa jika anak sangat rewel
-    # - Berikan penjelasan hasil kepada orang tua dengan bahasa yang mudah dipahami
-    # - Jangan membuat orang tua panik, berikan informasi dengan bijak
-    
-    # ### 📞 Kapan Harus Merujuk ke Tenaga Kesehatan:
-    # - Berat badan sangat kurang (di bawah garis merah KMS)
-    # - Tinggi badan sangat pendek untuk usianya
-    # - Lingkar kepala terlalu kecil (mikrosefali) atau terlalu besar (makrosefali)
-    # - Gizi buruk atau obesitas
-    # - Bengkak pada kedua kaki (edema)
-    # - Tidak ada kenaikan berat badan 2-3 bulan berturut-turut
-    # """)
-    
-    # st.markdown("---")
-    
-    # st.success("""
-    # ### 💡 Pesan untuk Kader Posyandu:
-    
-    # Pengukuran antropometri yang **akurat** dan **teliti** sangat penting untuk:
-    # - Mendeteksi dini masalah pertumbuhan anak
-    # - Mencegah stunting dan malnutrisi
-    # - Memantau efektivitas program gizi
-    # - Memberikan intervensi yang tepat waktu
-    
-    # **Peran kader sangat penting** dalam membantu menciptakan generasi Indonesia yang sehat, cerdas, dan bebas stunting!
-    # """)
-    
-    # st.info("📚 **Referensi:** Booklet Petunjuk Teknis Pengukuran Antropometri Dan Pencatatan Hasil Antropometri Dalam Buku KIA Bagi Kader - Kementerian Kesehatan RI")
-        
-    # st.caption("⚕️ Jika ragu atau menemukan kelainan, segera konsultasikan dengan bidan, perawat, atau dokter di Puskesmas terdekat.")
 
 # ========= SKRINING GIZI PAGE
 elif page == "🏠 Skrining Balita":
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        st.title("📋 Skrining Pertumbuhan & Status Gizi Balita")
-        st.markdown("Silakan masukkan hasil pengukuran yang telah dilakukan dengan tepat!")
-    # with col2:
-    #     try:
-    #         st.image("header situmbuh.png", width=250)
-    #     except:
-    #         pass
+    # col1, col2 = st.columns([2, 1])
+    # with col1:
+    st.title("Skrining Pertumbuhan & Status Gizi Balita")
+    st.markdown("Silakan masukkan hasil pengukuran yang telah dilakukan dengan tepat!")
     
     st.markdown("---")
     
@@ -1378,7 +1089,77 @@ elif page == "🏠 Skrining Balita":
 
             # Output gemini
             st.markdown("---")
-            st.markdown("### 🤖 Rekomendasi Gemini AI (Standard WHO)")
+            st.markdown("### Penjelasan Hasil Skrining")
             with st.spinner("AI sedang menganalisis data..."):
                 saran_ai = get_ai_analysis(data, status_z)
                 st.info(saran_ai)
+
+# ========= PROFILE PAGE
+elif page == "👤 Profile":
+    # Judul
+    st.title("📖 Tentang Kami")
+    st.markdown("---")
+    
+    # Deskripsi Sistem
+    st.markdown("""
+    <div style='background: linear-gradient(135deg, rgba(138, 166, 36, 0.1) 0%, rgba(254, 164, 5, 0.1) 100%); 
+                padding: 2rem; border-radius: 15px; border-left: 5px solid #8AA624;'>
+        <p style='font-size: 1.1rem; line-height: 1.8; text-align: justify;'>
+            <strong>Si Tumbuh</strong> merupakan sistem informasi berbasis web yang dikembangkan untuk mendukung skrining 
+            pertumbuhan balita dan penilaian status gizi anak di tingkat layanan kesehatan dasar. Sistem ini menggunakan 
+            data antropometri balita meliputi berat badan, tinggi/panjang badan, usia, dan jenis kelamin untuk menghitung 
+            indikator pertumbuhan (BB/U, TB/U, BB/TB, dan LK/U) berdasarkan standar WHO, sehingga dapat mengidentifikasi 
+            gangguan pertumbuhan dan risiko stunting secara dini.
+        </p>
+        <p style='font-size: 1.1rem; line-height: 1.8; text-align: justify;'>
+            Sebagai alat bantu skrining, Si Tumbuh menyajikan hasil pengukuran dalam bentuk visualisasi yang mudah dipahami, 
+            disertai interpretasi status gizi dan rekomendasi tindak lanjut awal yang ditujukan untuk mendukung peran kader 
+            Posyandu dan tenaga kesehatan. Sistem ini dirancang untuk memperkuat pemantauan pertumbuhan balita, deteksi dini 
+            masalah gizi, serta upaya promotif dan preventif dalam peningkatan kesehatan dan gizi anak.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # 3 Gambar Berjajar Horizontal (Responsif)
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.image("Khusna.png", use_container_width=True)
+        st.markdown("""
+        <div style='text-align: center; margin-top: 1rem;'>
+            <a href='mailto:khusnalathifah@gmail.com' style='text-decoration: none;'>
+                <button style='background: #8AA624; color: white; border: none; padding: 0.5rem 1.5rem; 
+                               border-radius: 5px; cursor: pointer; font-size: 1rem; width: 100%;'>
+                    📧 Kontak Khusna
+                </button>
+            </a>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.image("Mayang.png", use_container_width=True)
+        st.markdown("""
+        <div style='text-align: center; margin-top: 1rem;'>
+            <a href='mailto:gumelarmayang@gmail.com' style='text-decoration: none;'>
+                <button style='background: #8AA624; color: white; border: none; padding: 0.5rem 1.5rem; 
+                               border-radius: 5px; cursor: pointer; font-size: 1rem; width: 100%;'>
+                    📧 Kontak Mayang
+                </button>
+            </a>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.image("Via.png", use_container_width=True)
+        st.markdown("""
+        <div style='text-align: center; margin-top: 1rem;'>
+            <a href='mailto:setyoriniokviana@gmail.com' style='text-decoration: none;'>
+                <button style='background: #8AA624; color: white; border: none; padding: 0.5rem 1.5rem; 
+                               border-radius: 5px; cursor: pointer; font-size: 1rem; width: 100%;'>
+                    📧 Kontak Via
+                </button>
+            </a>
+        </div>
+        """, unsafe_allow_html=True)
