@@ -356,7 +356,7 @@ def stunting_risk_percent(hfa, wfa):
 
 
 ## ========= STREAMLIT
-st.set_page_config(page_title="Si Tumbuh")
+st.set_page_config(page_title="SI Tumbuh")
 
 # Custom CSS untuk mempercantik
 st.markdown("""
@@ -564,25 +564,25 @@ if st.session_state.view_mode == 'public':
     col1, col2 = st.columns([4, 1])
     with col1:
         st.image("header situmbuh.png")
-        # st.markdown(f"<h1 class='main-header'>👶 SI Tumbuh</h1>", unsafe_allow_html=True)
+        # st.markdown(f"<h1 class='main-header'> SI Tumbuh</h1>", unsafe_allow_html=True)
         # st.markdown("<p class='sub-header'>Berdasarkan Standar WHO</p>", unsafe_allow_html=True)
     with col2:
         st.write("")
         st.write("")
-        if st.button("🔐 Login Admin", use_container_width=True):
+        if st.button(" Login Admin", use_container_width=True):
             st.session_state.show_login_modal = True
             st.rerun()
 else:
     # Mode Admin - Tampilkan header dengan info user
     col1, col2, col3 = st.columns([3, 1, 1])
     with col1:
-        # st.markdown(f"<h1 class='main-header'>👶 SI Tumbuh</h1>", unsafe_allow_html=True)
+        # st.markdown(f"<h1 class='main-header'> SI Tumbuh</h1>", unsafe_allow_html=True)
         st.image("header situmbuh.png")
     with col2:
         st.write(f"**{st.session_state.nama_lengkap}**")
         st.caption(f"Role: {st.session_state.role.upper()}")
     with col3:
-        if st.button("🚪 Logout"):
+        if st.button(" Logout"):
             st.session_state.logged_in = False
             st.session_state.username = 'pengguna_umum'
             st.session_state.role = 'user'
@@ -598,7 +598,7 @@ if 'show_login_modal' in st.session_state and st.session_state.show_login_modal:
         st.markdown("---")
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.markdown("### 🔐 Login Admin")
+            st.markdown("###  Login Admin")
             
             with st.form("login_form"):
                 username = st.text_input("Username", placeholder="Masukkan username")
@@ -632,22 +632,22 @@ if 'show_login_modal' in st.session_state and st.session_state.show_login_modal:
 st.markdown("---")
 
 # Sidebar Navigation
-st.sidebar.title("📋 Menu Navigasi")
+st.sidebar.title(" Menu Navigasi")
 
 if st.session_state.view_mode == 'public':
-    st.sidebar.info("👥 Mode: Akses Publik\n\nAnda dapat menggunakan fitur skrining dan melihat panduan pengukuran.\n\nLogin sebagai admin untuk mengakses database.")
+    st.sidebar.info(" Mode: Akses Publik\n\nAnda dapat menggunakan fitur skrining dan melihat panduan pengukuran.\n\nLogin sebagai admin untuk mengakses database.")
 else:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
 
-menu_options = ["🏠 Skrining Balita", "📏 Cara Pengukuran", "👤 Profile"]
+menu_options = [" Skrining Balita", " Cara Pengukuran", " Profile"]
 if st.session_state.view_mode == 'admin' and st.session_state.role == 'admin':
-    menu_options.append("📊 Database (Admin)")
+    menu_options.append(" Database (Admin)")
     
 page = st.sidebar.radio("Pilih Menu:", menu_options)
 
 # ========= ADMIN DATABASE PAGE
-if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and st.session_state.role == 'admin':
-    st.title("📊 Database Hasil Pengukuran")
+if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.session_state.role == 'admin':
+    st.title(" Database Hasil Pengukuran")
     st.markdown("Dashboard untuk melihat semua data pengukuran yang telah direkam")
     
     df = get_all_measurements()
@@ -670,7 +670,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
         st.markdown("---")
         
         # Visualisasi Diagram Status Stunting
-        st.subheader("📊 Diagram Persentase Status Stunting")
+        st.subheader(" Diagram Persentase Status Stunting")
         
         col1, col2 = st.columns(2)
         
@@ -736,7 +736,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
         st.markdown("---")
         
         # Statistik per Daerah
-        st.subheader("📍 Statistik Risiko Stunting per Daerah")
+        st.subheader(" Statistik Risiko Stunting per Daerah")
         if 'alamat' in df.columns:
             alamat_stats = df.groupby('alamat').agg({
                 'id': 'count',
@@ -783,7 +783,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
         if st.session_state.edit_record_id is not None:
             record = get_measurement_by_id(st.session_state.edit_record_id)
             if record:
-                st.subheader("✏️ Edit Data Pengukuran")
+                st.subheader(" Edit Data Pengukuran")
                 
                 with st.form("edit_form"):
                     col1, col2 = st.columns(2)
@@ -807,9 +807,9 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
                     
                     col_submit, col_cancel = st.columns(2)
                     with col_submit:
-                        submit_edit = st.form_submit_button("✅ Simpan Perubahan", use_container_width=True)
+                        submit_edit = st.form_submit_button(" Simpan Perubahan", use_container_width=True)
                     with col_cancel:
-                        cancel_edit = st.form_submit_button("❌ Batal", use_container_width=True)
+                        cancel_edit = st.form_submit_button(" Batal", use_container_width=True)
                     
                     if submit_edit:
                         # Hitung ulang Z-Scores
@@ -845,7 +845,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
                         statuses = {'wfa': waz_label, 'hfa': haz_label, 'wfh': whz_label, 'hcfa': hcz_label}
                         
                         update_measurement(st.session_state.edit_record_id, edit_data, z_scores, statuses, risk, status)
-                        st.success("✅ Data berhasil diupdate!")
+                        st.success(" Data berhasil diupdate!")
                         st.session_state.edit_record_id = None
                         st.rerun()
                     
@@ -857,22 +857,22 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
         
         # Konfirmasi Delete
         if st.session_state.delete_confirm_id is not None:
-            st.warning("⚠️ Apakah Anda yakin ingin menghapus data ini?")
+            st.warning(" Apakah Anda yakin ingin menghapus data ini?")
             col1, col2, col3 = st.columns([1, 1, 2])
             with col1:
-                if st.button("✅ Ya, Hapus", use_container_width=True):
+                if st.button(" Ya, Hapus", use_container_width=True):
                     delete_measurement(st.session_state.delete_confirm_id)
-                    st.success("✅ Data berhasil dihapus!")
+                    st.success(" Data berhasil dihapus!")
                     st.session_state.delete_confirm_id = None
                     st.rerun()
             with col2:
-                if st.button("❌ Batal", use_container_width=True):
+                if st.button(" Batal", use_container_width=True):
                     st.session_state.delete_confirm_id = None
                     st.rerun()
             st.markdown("---")
         
         # Display table
-        st.subheader(f"📋 Data Pengukuran ({len(filtered_df)} records)")
+        st.subheader(f" Data Pengukuran ({len(filtered_df)} records)")
         
         # Format display columns
         display_cols = ['id', 'tanggal_pengukuran', 'nama_anak', 'usia_bulan', 'gender']
@@ -904,7 +904,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
             record_id_to_edit = st.number_input("Masukkan ID untuk Edit", min_value=0, step=1, value=0, key="id_edit")
-            if st.button("✏️ Edit Data", use_container_width=True):
+            if st.button(" Edit Data", use_container_width=True):
                 if record_id_to_edit > 0:
                     st.session_state.edit_record_id = record_id_to_edit
                     st.rerun()
@@ -913,7 +913,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
         
         with col2:
             record_id_to_delete = st.number_input("Masukkan ID untuk Hapus", min_value=0, step=1, value=0, key="id_delete")
-            if st.button("🗑️ Hapus Data", use_container_width=True, type="secondary"):
+            if st.button(" Hapus Data", use_container_width=True, type="secondary"):
                 if record_id_to_delete > 0:
                     st.session_state.delete_confirm_id = record_id_to_delete
                     st.rerun()
@@ -923,7 +923,7 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
         st.markdown("---")
         csv = filtered_df.to_csv(index=False)
         st.download_button(
-            label="📥 Download Data (CSV)",
+            label=" Download Data (CSV)",
             data=csv,
             file_name=f"data_stunting_{dt.now().strftime('%Y%m%d_%H%M%S')}.csv",
             mime="text/csv",
@@ -933,15 +933,15 @@ if page == "📊 Database (Admin)" and st.session_state.view_mode == 'admin' and
         st.info("Belum ada data pengukuran yang tersimpan.")
 
 # ========= CARA PENGUKURAN PAGE
-elif page == "📏 Cara Pengukuran":
+elif page == " Cara Pengukuran":
     # st.image("header situmbuh.png", width=400)
-    st.title("📏 Panduan Cara Pengukuran Antropometri Balita")
-    st.info("📚 **Referensi:** Akun Youtube @direktoratYanKesga")
+    st.title(" Panduan Cara Pengukuran Antropometri Balita")
+    st.info(" **Referensi:** Akun Youtube @direktoratYanKesga")
     st.video('https://youtu.be/D-_JimQkBuA?si=Un2gdqlYUfy1fTQ6')
     st.markdown("---")
 
 # ========= SKRINING GIZI PAGE
-elif page == "🏠 Skrining Balita":
+elif page == " Skrining Balita":
     # col1, col2 = st.columns([2, 1])
     # with col1:
     st.title("Skrining Pertumbuhan & Status Gizi Balita")
@@ -953,7 +953,7 @@ elif page == "🏠 Skrining Balita":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("📝 Data Balita")
+        st.subheader(" Data Balita")
         date = st.date_input("Tanggal Pengukuran", value=None)
         name = st.text_input("Nama Anak", placeholder="Masukkan nama lengkap anak")
         alamat = st.text_input("Alamat/Desa", placeholder="Contoh: Desa Slogo, Kec. Tanon")
@@ -961,7 +961,7 @@ elif page == "🏠 Skrining Balita":
         sex = st.selectbox("Jenis Kelamin", ["L", "P"], format_func=lambda x: "Laki-laki" if x == "L" else "Perempuan")
     
     with col2:
-        st.subheader("📏 Hasil Pengukuran")
+        st.subheader(" Hasil Pengukuran")
         weight = st.number_input("Berat Badan (kg)", min_value=0.0, max_value=50.0, step=0.1, format="%.1f")
         height = st.number_input("Panjang/Tinggi Badan (cm)", min_value=0.0, max_value=150.0, step=0.1, format="%.1f")
         hc = st.number_input("Lingkar Kepala (cm)", min_value=0.0, max_value=60.0, step=0.1, format="%.1f")
@@ -970,11 +970,11 @@ elif page == "🏠 Skrining Balita":
     
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        analyze_button = st.button("🔍 Analisis Data", type="primary", use_container_width=True)
+        analyze_button = st.button(" Analisis Data", type="primary", use_container_width=True)
     
     if analyze_button:
         if not name or not alamat or age == 0 or weight == 0 or height == 0 or hc == 0:
-            st.error("⚠️ Mohon lengkapi semua data pengukuran!")
+            st.error(" Mohon lengkapi semua data pengukuran!")
         else:
             data = {
                 "date": date,
@@ -1016,24 +1016,24 @@ elif page == "🏠 Skrining Balita":
             statuses = {'wfa': waz_label, 'hfa': haz_label, 'wfh': whz_label, 'hcfa': hcz_label}
             save_measurement(data, z_scores, statuses, risk, status, st.session_state.username)
             
-            st.success("✅ Data berhasil dianalisis dan disimpan!")
+            st.success(" Data berhasil dianalisis dan disimpan!")
             st.markdown("---")
             
             # Header Hasil
-            st.markdown(f"<h2 style='text-align: center; color: #8AA624;'>📊 Hasil Analisis: {data['name']}</h2>", unsafe_allow_html=True)
+            st.markdown(f"<h2 style='text-align: center; color: #8AA624;'> Hasil Analisis: {data['name']}</h2>", unsafe_allow_html=True)
             st.markdown(f"<p style='text-align: center;'>Tanggal Pengukuran: <b>{data['date']}</b> | Usia: <b>{data['age']} bulan</b> | Jenis Kelamin: <b>{'Laki-laki' if data['sex'] == 'L' else 'Perempuan'}</b></p>", unsafe_allow_html=True)
             
             st.markdown("---")
             
             # Data Antropometri dalam Cards
-            st.subheader("📊 Indikator Antropometri (Z-Score)")
+            st.subheader(" Indikator Antropometri (Z-Score)")
             
             col1, col2 = st.columns(2)
             
             with col1:
                 st.markdown(f"""
                 <div class='metric-card'>
-                    <h4>⚖️ Berat Badan menurut Usia (WFA)</h4>
+                    <h4> Berat Badan menurut Usia (WFA)</h4>
                     <p style='font-size: 1.8rem; font-weight: 800; color: #FFEB3B; text-shadow: 2px 2px 3px rgba(0,0,0,0.4);'>Z-Score: {WFA}</p>
                     <p style='font-size: 1.1rem;'><b>Status:</b> {waz_label}</p>
                 </div>
@@ -1041,7 +1041,7 @@ elif page == "🏠 Skrining Balita":
                 
                 st.markdown(f"""
                 <div class='metric-card'>
-                    <h4>📏 Berat Badan menurut Tinggi (WFH)</h4>
+                    <h4> Berat Badan menurut Tinggi (WFH)</h4>
                     <p style='font-size: 1.8rem; font-weight: 800; color: #FFEB3B; text-shadow: 2px 2px 3px rgba(0,0,0,0.4);'>Z-Score: {WFH}</p>
                     <p style='font-size: 1.1rem;'><b>Status:</b> {whz_label}</p>
                 </div>
@@ -1050,7 +1050,7 @@ elif page == "🏠 Skrining Balita":
             with col2:
                 st.markdown(f"""
                 <div class='metric-card'>
-                    <h4>📐 Tinggi Badan menurut Usia (HFA)</h4>
+                    <h4> Tinggi Badan menurut Usia (HFA)</h4>
                     <p style='font-size: 1.8rem; font-weight: 800; color: #FFEB3B; text-shadow: 2px 2px 3px rgba(0,0,0,0.4);'>Z-Score: {HFA}</p>
                     <p style='font-size: 1.1rem;'><b>Status:</b> {haz_label}</p>
                 </div>
@@ -1058,7 +1058,7 @@ elif page == "🏠 Skrining Balita":
                 
                 st.markdown(f"""
                 <div class='metric-card'>
-                    <h4>🧠 Lingkar Kepala menurut Usia (HCFA)</h4>
+                    <h4> Lingkar Kepala menurut Usia (HCFA)</h4>
                     <p style='font-size: 1.8rem; font-weight: 800; color: #FFEB3B; text-shadow: 2px 2px 3px rgba(0,0,0,0.4);'>Z-Score: {HCFA}</p>
                     <p style='font-size: 1.1rem;'><b>Status:</b> {hcz_label}</p>
                 </div>
@@ -1067,7 +1067,7 @@ elif page == "🏠 Skrining Balita":
             st.markdown("---")
             
             # Interpretasi Stunting
-            st.subheader("🩺 Interpretasi Risiko Stunting")
+            st.subheader(" Interpretasi Risiko Stunting")
             
             col1, col2 = st.columns([1, 2])
             with col1:
@@ -1080,12 +1080,12 @@ elif page == "🏠 Skrining Balita":
             
             with col2:
                 if status != "Tidak Berisiko Stunting":
-                    st.error(f"⚠️ **Status Stunting:** {status}")
+                    st.error(f" **Status Stunting:** {status}")
                 else:
-                    st.success(f"✅ **Status Stunting:** {status}")
+                    st.success(f" **Status Stunting:** {status}")
             
             st.markdown("---")
-            st.caption("⚕️ Hasil ini merupakan skrining awal. Untuk diagnosis dan penanganan lebih lanjut, konsultasikan dengan tenaga kesehatan profesional.")
+            st.caption(" Hasil ini merupakan skrining awal. Untuk diagnosis dan penanganan lebih lanjut, konsultasikan dengan tenaga kesehatan profesional.")
 
             # Output gemini
             st.markdown("---")
@@ -1095,9 +1095,9 @@ elif page == "🏠 Skrining Balita":
                 st.info(saran_ai)
 
 # ========= PROFILE PAGE
-elif page == "👤 Profile":
+elif page == " Profile":
     # Judul
-    st.title("📖 Tentang Kami")
+    st.title(" Tentang Kami")
     st.markdown("---")
     
     # Deskripsi Sistem
@@ -1132,7 +1132,7 @@ elif page == "👤 Profile":
             <a href='mailto:khusnalathifah@gmail.com' style='text-decoration: none;'>
                 <button style='background: #8AA624; color: white; border: none; padding: 0.5rem 1.5rem; 
                                border-radius: 5px; cursor: pointer; font-size: 1rem; width: 100%;'>
-                    📧 Kontak Khusna
+                     Kontak Khusna
                 </button>
             </a>
         </div>
@@ -1145,7 +1145,7 @@ elif page == "👤 Profile":
             <a href='mailto:gumelarmayang@gmail.com' style='text-decoration: none;'>
                 <button style='background: #8AA624; color: white; border: none; padding: 0.5rem 1.5rem; 
                                border-radius: 5px; cursor: pointer; font-size: 1rem; width: 100%;'>
-                    📧 Kontak Mayang
+                     Kontak Mayang
                 </button>
             </a>
         </div>
@@ -1158,7 +1158,7 @@ elif page == "👤 Profile":
             <a href='mailto:setyoriniokviana@gmail.com' style='text-decoration: none;'>
                 <button style='background: #8AA624; color: white; border: none; padding: 0.5rem 1.5rem; 
                                border-radius: 5px; cursor: pointer; font-size: 1rem; width: 100%;'>
-                    📧 Kontak Via
+                     Kontak Via
                 </button>
             </a>
         </div>
