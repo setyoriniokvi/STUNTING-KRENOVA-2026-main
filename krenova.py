@@ -356,7 +356,7 @@ def stunting_risk_percent(hfa, wfa):
 
 
 ## ========= STREAMLIT
-st.set_page_config(page_title="Si Tumbuh")
+st.set_page_config(page_title="SI Tumbuh")
 
 # Custom CSS untuk mempercantik
 st.markdown("""
