@@ -248,6 +248,7 @@ def calc_hfa(age, sex, height):
 def calc_wfh(age, sex, weight, body_cm):
     # Tentukan tipe pengukuran berdasarkan usia
     # m_type = "Length" if age < 24 == "Height" elif == 24 else "Height"
+
     if age < 24:
         m_type = "Length"
     elif age == 24:
@@ -256,17 +257,25 @@ def calc_wfh(age, sex, weight, body_cm):
         m_type = "Height"
 
     # Filter data WHO sesuai kolom dataset kamu
-    ref = wfh[
+    ref_data = wfh[
         (wfh["Gender"] == sex) &
-        (wfh["Pengukuran"] == m_type) &
-        (wfh["Tinggi"] == round(body_cm, 1))
+        (wfh["Pengukuran"] == m_type)
+        # (wfh["Tinggi"] == round(body_cm, 1))
     ]
 
-    if ref.empty:
+    if ref_data.empty:
         return None
+    
+    # Cari tinggi terdekat di tabel WHO
+    ref_data = ref_data.copy()
+    ref_data["diff"] = abs(ref_data["Tinggi"] - body_cm)
+    ref = ref_data.sort_values("diff").iloc[0]
 
-    L, M, S = ref[["L", "M", "S"]].values[0]
+    L, M, S = ref["L"], ref["M"], ref["S"]
     return who_zscore(weight, L, M, S)
+
+    # L, M, S = ref[["L", "M", "S"]].values[0]
+    # return who_zscore(weight, L, M, S)
 
 ## LK Berdasarkan Usia
 def calc_hcfa(age, sex, hc):
