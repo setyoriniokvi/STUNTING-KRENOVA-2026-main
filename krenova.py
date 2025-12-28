@@ -257,7 +257,7 @@ def calc_wfh(age, sex, weight, body_cm):
     #     m_type = "Height"
 
     # Filter data WHO sesuai kolom dataset kamu
-    ref_data = wfh[
+    ref = wfh[
         (wfh["Gender"] == sex) &
         (wfh["Pengukuran"] == m_type)
         # (wfh["Tinggi"] == round(body_cm, 1))
@@ -267,12 +267,12 @@ def calc_wfh(age, sex, weight, body_cm):
         return None
     
     # Cari tinggi terdekat di tabel WHO
-    ref_data = ref_data.copy()
+    ref_data = ref.copy()
     ref_data["diff"] = abs(ref_data["Tinggi"] - body_cm)
-    
-    ref = ref_data.sort_values("diff").iloc[0]
 
-    L, M, S = ref[["L", "M", "S"]].values[0]
+    reff = ref_data.sort_values("diff").iloc[0]
+
+    L, M, S = reff[["L", "M", "S"]].values[0]
     return who_zscore(weight, L, M, S)
 
 ## LK Berdasarkan Usia
