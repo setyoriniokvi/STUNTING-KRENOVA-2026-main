@@ -247,14 +247,14 @@ def calc_hfa(age, sex, height):
 ## BB Terhadap Panjang/Tinggi Badan
 def calc_wfh(age, sex, weight, body_cm):
     # Tentukan tipe pengukuran berdasarkan usia
-    # m_type = "Length" if age < 24 == "Height" elif == 24 else "Height"
+    m_type = "Length" if age < 24 == "Height" else "Height"
 
-    if age < 24:
-        m_type = "Length"
-    elif age == 24:
-        m_type = "Height"
-    else:
-        m_type = "Height"
+    # if age < 24:
+    #     m_type = "Length"
+    # elif age == 24:
+    #     m_type = "Height"
+    # else:
+    #     m_type = "Height"
 
     # Filter data WHO sesuai kolom dataset kamu
     ref_data = wfh[
@@ -269,6 +269,7 @@ def calc_wfh(age, sex, weight, body_cm):
     # Cari tinggi terdekat di tabel WHO
     ref_data = ref_data.copy()
     ref_data["diff"] = abs(ref_data["Tinggi"] - body_cm)
+    
     ref = ref_data.sort_values("diff").iloc[0]
 
     L, M, S = ref[["L", "M", "S"]].values[0]
@@ -844,8 +845,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                         
                         WFA = safe_round(waz_z)
                         HFA = safe_round(haz_z)
-                        WFH = whz_z
-                        # WFH = safe_round(whz_z)
+                        WFH = safe_round(whz_z)
                         HCFA = safe_round(hcz_z)
                         
                         z_scores = {'wfa': WFA, 'hfa': HFA, 'wfh': WFH, 'hcfa': HCFA}
