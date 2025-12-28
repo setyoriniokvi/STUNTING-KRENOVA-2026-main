@@ -271,11 +271,8 @@ def calc_wfh(age, sex, weight, body_cm):
     ref_data["diff"] = abs(ref_data["Tinggi"] - body_cm)
     ref = ref_data.sort_values("diff").iloc[0]
 
-    L, M, S = ref["L"], ref["M"], ref["S"]
+    L, M, S = ref[["L", "M", "S"]].values[0]
     return who_zscore(weight, L, M, S)
-
-    # L, M, S = ref[["L", "M", "S"]].values[0]
-    # return who_zscore(weight, L, M, S)
 
 ## LK Berdasarkan Usia
 def calc_hcfa(age, sex, hc):
@@ -847,7 +844,8 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                         
                         WFA = safe_round(waz_z)
                         HFA = safe_round(haz_z)
-                        WFH = safe_round(whz_z)
+                        WFH = whz_z
+                        # WFH = safe_round(whz_z)
                         HCFA = safe_round(hcz_z)
                         
                         z_scores = {'wfa': WFA, 'hfa': HFA, 'wfh': WFH, 'hcfa': HCFA}
