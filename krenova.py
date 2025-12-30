@@ -869,7 +869,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         
         # Display table
         # WARNING
-        st.warning(
+        st.error(
             " **PERHATIAN:** Jangan lupa **DOWNLOAD DATA (CSV)** setiap selesai proses skrining "
             "**SETIAP HARI** untuk menghindari kehilangan data."
         )
