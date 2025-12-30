@@ -868,7 +868,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
             st.markdown("---")
         
         # Display table
-                # WARNING sebelum tabel datag
+        # WARNING
         st.warning(
             " **PERHATIAN:** Jangan lupa **DOWNLOAD DATA (CSV)** setiap selesai proses skrining "
             "**SETIAP HARI** untuk menghindari kehilangan data."
