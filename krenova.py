@@ -868,6 +868,12 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
             st.markdown("---")
         
         # Display table
+                # WARNING sebelum tabel datag
+        st.warning(
+            " **PERHATIAN:** Jangan lupa **DOWNLOAD DATA (CSV)** setiap selesai proses skrining "
+            "**SETIAP HARI** untuk menghindari kehilangan data."
+        )
+
         st.subheader(f" Data Pengukuran ({len(filtered_df)} records)")
         
         # Format display columns
