@@ -69,7 +69,7 @@ def get_ai_analysis(data_anak, status_z):
 
 # ========= DATABASE SETUP
 def init_database():
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('krenova_data.db')
     c = conn.cursor()
     
     # Tabel Users
@@ -126,7 +126,7 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def verify_login(username, password):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('krenova_data.db')
     c = conn.cursor()
     hashed_pw = hash_password(password)
     c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, hashed_pw))
@@ -135,7 +135,7 @@ def verify_login(username, password):
     return user
 
 def save_measurement(data, z_scores, statuses, risk, status_stunting, username):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('krenova_data.db')
     c = conn.cursor()
     c.execute('''INSERT INTO measurements 
                  (tanggal_pengukuran, nama_anak, usia_bulan, gender, alamat, berat_badan, tinggi_badan, 
@@ -150,13 +150,13 @@ def save_measurement(data, z_scores, statuses, risk, status_stunting, username):
     conn.close()
 
 def get_all_measurements():
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('krenova_data.db')
     df = pd.read_sql_query("SELECT * FROM measurements ORDER BY created_at DESC", conn)
     conn.close()
     return df
 
 def update_measurement(record_id, data, z_scores, statuses, risk, status_stunting):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('krenova_data.db')
     c = conn.cursor()
     c.execute('''UPDATE measurements 
                  SET tanggal_pengukuran=?, nama_anak=?, usia_bulan=?, gender=?, alamat=?, 
@@ -174,14 +174,14 @@ def update_measurement(record_id, data, z_scores, statuses, risk, status_stuntin
     conn.close()
 
 def delete_measurement(record_id):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('krenova_data.db')
     c = conn.cursor()
     c.execute('DELETE FROM measurements WHERE id=?', (record_id,))
     conn.commit()
     conn.close()
 
 def get_measurement_by_id(record_id):
-    conn = sqlite3.connect('/tmp/krenova_data.db')
+    conn = sqlite3.connect('krenova_data.db')
     c = conn.cursor()
     c.execute('SELECT * FROM measurements WHERE id=?', (record_id,))
     result = c.fetchone()
