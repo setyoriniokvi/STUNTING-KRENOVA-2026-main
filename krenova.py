@@ -869,10 +869,10 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         
         # Display table
         # WARNING
-        st.error(
-            " **PERHATIAN:** Jangan lupa **DOWNLOAD DATA (CSV)** setiap selesai proses skrining "
-            "**SETIAP HARI** untuk menghindari kehilangan data."
-        )
+        # st.error(
+        #     " **PERHATIAN:** Jangan lupa **DOWNLOAD DATA (CSV)** setiap selesai proses skrining "
+        #     "**SETIAP HARI** untuk menghindari kehilangan data."
+        # )
 
         st.subheader(f" Data Pengukuran ({len(filtered_df)} records)")
         
@@ -1107,14 +1107,14 @@ elif page == " Profile":
     <div style='background: linear-gradient(135deg, rgba(138, 166, 36, 0.1) 0%, rgba(254, 164, 5, 0.1) 100%); 
                 padding: 2rem; border-radius: 15px; border-left: 5px solid #8AA624;'>
         <p style='font-size: 1.1rem; line-height: 1.8; text-align: justify;'>
-            <strong>Si Tumbuh</strong> merupakan sistem informasi berbasis web yang dikembangkan untuk mendukung skrining 
+            <strong>SI Tumbuh</strong> merupakan sistem informasi berbasis web yang dikembangkan untuk mendukung skrining 
             pertumbuhan balita dan penilaian status gizi anak di tingkat layanan kesehatan dasar. Sistem ini menggunakan 
             data antropometri balita meliputi berat badan, tinggi/panjang badan, usia, dan jenis kelamin untuk menghitung 
             indikator pertumbuhan (BB/U, TB/U, BB/TB, dan LK/U) berdasarkan standar WHO, sehingga dapat mengidentifikasi 
             gangguan pertumbuhan dan risiko stunting secara dini.
         </p>
         <p style='font-size: 1.1rem; line-height: 1.8; text-align: justify;'>
-            Sebagai alat bantu skrining, Si Tumbuh menyajikan hasil pengukuran dalam bentuk visualisasi yang mudah dipahami, 
+            Sebagai alat bantu skrining, SI Tumbuh menyajikan hasil pengukuran dalam bentuk visualisasi yang mudah dipahami, 
             disertai interpretasi status gizi dan rekomendasi tindak lanjut awal yang ditujukan untuk mendukung peran kader 
             Posyandu dan tenaga kesehatan. Sistem ini dirancang untuk memperkuat pemantauan pertumbuhan balita, deteksi dini 
             masalah gizi, serta upaya promotif dan preventif dalam peningkatan kesehatan dan gizi anak.
