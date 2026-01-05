@@ -284,24 +284,19 @@ def stunting_status(z):
 ## ======= EVALUASI GIZI
 ### Berat/Usia
 def wfa_status(z):
-    normal = " -2 s/d +2"
-
-    if z < -3:
-        status = "Berat Badan Anak Sangat Kurang!"
+    
+    if z is None:
+        return None
+    elif z < -3 :
+        return "Berat Anak Sangat Kurang\nZ-Score normal -2 s/d +2"
     elif z < -2:
-        status = "Berat Badan Anak Kurang!"
+        return "Berat Anak Kurang\nZ-Score normal -2 s/d +2"
     elif z > 3:
-        status = "Anak Obesitas!"
+        return "Anak Obesitas\nZ-Score normal -2 s/d +2"
     elif z > 2:
-        status = "Berat Badan Anak Berlebih!"
+        return "Berat Badan Anak Berlebih\nZ-Score normal -2 s/d +2"
     else:
-        status = "Berat Badan Anak Normal!"
-
-    return {
-        "z_score": z,
-        "status": status,
-        "z_score_normal": normal
-    }
+        return "Berat Badan Anak Normal\nZ-Score normal -2 s/d +2"
 
 ### Tinggi/Usia
 def hfa_status(z):
