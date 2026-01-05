@@ -290,10 +290,10 @@ def wfa_status(z):
         return "Berat Anak Sangat Kurang"
     elif z < -2:
         return "Berat Anak Kurang"
-    elif z > 2:
-        return "Berat Badan Anak Berlebih"
     elif z > 3:
         return "Anak Obesitas"
+    elif z > 2:
+        return "Berat Badan Anak Berlebih"
     else:
         return "Berat Badan Anak Normal"
 
@@ -318,10 +318,10 @@ def wfh_status(z):
         return "Gizi Anak Buruk"
     elif z < -2:
         return "Gizi Anak Kurang"
-    elif z > 2:
-        return "Anak Overweight"
     elif z > 3:
         return  "Anak Obesitas"
+    elif z > 2:
+        return "Anak Overweight"
     else:
         return "Gizi Anak Baik/Normal"
 
