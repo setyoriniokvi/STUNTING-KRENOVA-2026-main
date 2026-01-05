@@ -44,7 +44,7 @@ def get_ai_analysis(data_anak, status_z):
     2. Menjelaskan arti kombinasi indikator antropometri tersebut terhadap risiko pertumbuhan anak
     3. Menyampaikan hasil dalam bahasa non-teknis dan tidak menakutkan
     4. Menyusun saran tindak lanjut awal yang dapat dilakukan kader Posyandu
-    ormat keluaran WAJIB sebagai berikut:
+    format keluaran WAJIB sebagai berikut:
 
     1. Ringkasan Hasil Skrining
     (jelaskan kondisi pertumbuhan anak secara umum)
@@ -57,6 +57,8 @@ def get_ai_analysis(data_anak, status_z):
 
     4. Catatan Penting
     (tegaskan bahwa hasil ini bukan diagnosis dan perlu konfirmasi tenaga kesehatan)
+
+    5. Tambahan: Gunakan bahasa yang mudah dipahami oleh ibu-ibu posyandu dan orang tua, karena di desa tidak semua memiliki akses ke pendidikan tinggi. Tidak menakut-nakuti dan tetap ramah.
 """
     try:
         response = client.models.generate_content(
