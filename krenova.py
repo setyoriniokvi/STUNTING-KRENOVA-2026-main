@@ -303,39 +303,39 @@ def hfa_status(z):
     if z is None:
         return None
     elif z < -3:
-        return "Anak Sangat Pendek"
+        return "Anak Sangat Pendek\nZ-Score normal -2 s/d +3"
     elif z < -2:
-        return "Anak Pendek"
+        return "Anak Pendek\nZ-Score normal -2 s/d +3"
     elif z > 3:
-        return "Anak Tinggi"
+        return "Anak Tinggi\nZ-Score normal -2 s/d +3"
     else:
-        return "Tinggi Anak Normal"
+        return "Tinggi Anak Normal\nZ-Score normal -2 s/d +3"
 
 ### Berat/Tinggi
 def wfh_status(z):
     if z is None:
         return None
     elif z < -3:
-        return "Gizi Anak Buruk"
+        return "Gizi Anak Buruk\nZ-Score normal -2 s/d +2"
     elif z < -2:
-        return "Gizi Anak Kurang"
+        return "Gizi Anak Kurang\nZ-Score normal -2 s/d +2"
     elif z > 3:
-        return  "Anak Obesitas"
+        return  "Anak Obesitas\nZ-Score normal -2 s/d +2"
     elif z > 2:
-        return "Anak Overweight"
+        return "Anak Overweight\nZ-Score normal -2 s/d +2"
     else:
-        return "Gizi Anak Baik/Normal"
+        return "Gizi Anak Baik/Normal\nZ-Score normal -2 s/d +2"
 
 ### Lingkar Kepala/Usia
 def hcaf_status(z):
     if z is None:
         return None
     elif z < -2:
-        return "Anak Terindikasi Microcephaly. Berisiko keterlambatan kognitif, motorik, dan belajar jangka panjang, serta gangguan neurologis"
+        return "Anak Terindikasi Microcephaly. Berisiko keterlambatan kognitif, motorik, dan belajar jangka panjang, serta gangguan neurologis\nZ-Score normal -2 s/d +2"
     elif z > 2:
-        return "Anak Terindikasi Macrocephaly. Indikasi adanya hydrocephalus atau masalah genetik, memerlukan skrining dini"
+        return "Anak Terindikasi Macrocephaly. Indikasi adanya hydrocephalus atau masalah genetik, memerlukan skrining dini\nZ-Score normal -2 s/d +2"
     else:
-        return "Lingkar Kepala Anak Normal"
+        return "Lingkar Kepala Anak Normal\nZ-Score normal -2 s/d +2"
 
 ## ======= SAFE ROUND
 def safe_round(x):
