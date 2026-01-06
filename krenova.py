@@ -6,7 +6,7 @@ from datetime import datetime as dt
 import hashlib
 from google import genai
 
-# ========= INTEGRASI GEMINI
+# ========= INTEGRASI GEMINI AI
 ### ======= KONFIGURASI AI
 try:
     client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
