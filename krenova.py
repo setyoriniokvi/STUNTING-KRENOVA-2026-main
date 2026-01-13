@@ -1017,8 +1017,16 @@ elif page == " Skrining Balita":
                 if age_val < 0: age_val = 0
         
         if birth_date:
+            if age_val > 60:
+                st.error(f"Usia terdeteksi {age_val} bulan. Sistem ini khusus untuk balita (0-60 bulan)")
+                input_age_val = 60
+            else:
+                st.info(f"Usia Terhitung: {age_val} bulan")
+                input_age_val = age_val
+        
+        if birth_date:
             st.info(f"Usia Terhitung: **{age_val} bulan**")
-            age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=age_val)
+            age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=input_age_val)
         else:
             age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=0)
             
