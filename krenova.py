@@ -104,7 +104,15 @@ def init_database():
                   risiko_stunting_persen INTEGER,
                   status_stunting TEXT,
                   created_by TEXT,
+                  tanggal_lahir DATE,
                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+
+    # Migration for existing tables
+    try:
+        c.execute("SELECT tanggal_lahir FROM measurements LIMIT 1")
+    except sqlite3.OperationalError:
+        c.execute("ALTER TABLE measurements ADD COLUMN tanggal_lahir DATE")
+
     
     # Insert default admin jika belum ada
     c.execute("SELECT * FROM users WHERE username='tumbuh'")
@@ -142,12 +150,14 @@ def save_measurement(data, z_scores, statuses, risk, status_stunting, username):
     c.execute('''INSERT INTO measurements 
                  (tanggal_pengukuran, nama_anak, usia_bulan, gender, alamat, berat_badan, tinggi_badan, 
                   lingkar_kepala, wfa_zscore, wfa_status, hfa_zscore, hfa_status, wfh_zscore, 
-                  wfh_status, hcfa_zscore, hcfa_status, risiko_stunting_persen, status_stunting, created_by)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                  wfh_status, hcfa_zscore, hcfa_status, risiko_stunting_persen, status_stunting, created_by, tanggal_lahir)
+
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
               (data['date'], data['name'], data['age'], data['sex'], data['alamat'], data['weight'], data['height'],
                data['hc'], z_scores['wfa'], statuses['wfa'], z_scores['hfa'], statuses['hfa'],
                z_scores['wfh'], statuses['wfh'], z_scores['hcfa'], statuses['hcfa'],
-               risk, status_stunting, username))
+               risk, status_stunting, username, data.get('birth_date')))
+
     conn.commit()
     conn.close()
 
@@ -165,13 +175,14 @@ def update_measurement(record_id, data, z_scores, statuses, risk, status_stuntin
                      berat_badan=?, tinggi_badan=?, lingkar_kepala=?,
                      wfa_zscore=?, wfa_status=?, hfa_zscore=?, hfa_status=?, 
                      wfh_zscore=?, wfh_status=?, hcfa_zscore=?, hcfa_status=?,
-                     risiko_stunting_persen=?, status_stunting=?
+                     risiko_stunting_persen=?, status_stunting=?, tanggal_lahir=?
                  WHERE id=?''',
               (data['date'], data['name'], data['age'], data['sex'], data['alamat'], 
                data['weight'], data['height'], data['hc'],
                z_scores['wfa'], statuses['wfa'], z_scores['hfa'], statuses['hfa'],
                z_scores['wfh'], statuses['wfh'], z_scores['hcfa'], statuses['hcfa'],
-               risk, status_stunting, record_id))
+               risk, status_stunting, data.get('birth_date'), record_id))
+
     conn.commit()
     conn.close()
 
@@ -786,6 +797,17 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                 
                 with st.form("edit_form"):
                     col1, col2 = st.columns(2)
+
+                    raw_birth_date = record[-1] 
+        
+                    try:
+                        if raw_birth_date:
+                            # Pastikan dikonversi ke objek date
+                            birth_date_val = pd.to_datetime(raw_birth_date).date()
+                        else:
+                            birth_date_val = dt.now().date()
+                    except:
+                        birth_date_val = dt.now().date()
                     
                     with col1:
                         edit_date = st.date_input("Tanggal Pengukuran", value=pd.to_datetime(record[1]).date())
@@ -803,6 +825,21 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                                                      value=float(record[7]), step=0.1, format="%.1f")
                         edit_hc = st.number_input("Lingkar Kepala (cm)", min_value=0.0, max_value=60.0, 
                                                  value=float(record[8]), step=0.1, format="%.1f")
+                        
+                        # Handle tanggal_lahir (index 20 if logic holds, but let's check retrieval)
+                        # record comes from SELECT * FROM measurements. 
+                        # columns: 0:id, 1:tanggal, 2:nama, 3:usia, 4:gender, 5:alamat, 6:bb, 7:tb, 8:lk, ...
+                        # 19: created_by, 20: tanggal_lahir (newly added at end)
+                        
+                        # birth_date_val = None
+                        # if len(record) > 20 and record[20]:
+                        #     try:
+                        #         birth_date_val = pd.to_datetime(record[20]).date()
+                        #     except:
+                        #         birth_date_val = None
+                        
+                        edit_birth_date = st.date_input("Tanggal Lahir", value=birth_date_val)
+
                     
                     col_submit, col_cancel = st.columns(2)
                     with col_submit:
@@ -820,8 +857,10 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                             "sex": edit_sex,
                             "weight": edit_weight,
                             "height": edit_height,
-                            "hc": edit_hc
+                            "hc": edit_hc,
+                            "birth_date": edit_birth_date
                         }
+
                         
                         waz_z = calc_wfa(edit_data["age"], edit_data["sex"], edit_data["weight"])
                         waz_label = wfa_status(waz_z)
@@ -881,6 +920,11 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         if 'alamat' in filtered_df.columns:
             display_cols.append('alamat')
             display_names.append('Alamat')
+            
+        if 'tanggal_lahir' in filtered_df.columns:
+            display_cols.append('tanggal_lahir')
+            display_names.append('Tgl Lahir')
+
         
         display_cols.extend([
             'berat_badan', 'tinggi_badan', 'lingkar_kepala',
@@ -957,8 +1001,29 @@ elif page == " Skrining Balita":
         date = st.date_input("Tanggal Pengukuran", value=None)
         name = st.text_input("Nama Anak", placeholder="Masukkan nama lengkap anak")
         alamat = st.text_input("Alamat/Desa", placeholder="Contoh: Desa Slogo, Kec. Tanon")
-        age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=0)
+        
+        birth_date = st.date_input("Tanggal Lahir Anak", value=None)
+        
+        # Auto-calculate age if birth_date is set
+        age_val = 0
+        if birth_date:
+            today = dt.now().date()
+            if birth_date <= today:
+                # Calculate age in months
+                age_val = (today.year - birth_date.year) * 12 + (today.month - birth_date.month)
+                # Adjust if day is before birth day
+                if today.day < birth_date.day:
+                    age_val -= 1
+                if age_val < 0: age_val = 0
+        
+        if birth_date:
+            st.info(f"Usia Terhitung: **{age_val} bulan**")
+            age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=age_val)
+        else:
+            age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=0)
+            
         sex = st.selectbox("Jenis Kelamin", ["L", "P"], format_func=lambda x: "Laki-laki" if x == "L" else "Perempuan")
+
     
     with col2:
         st.subheader(" Hasil Pengukuran")
@@ -984,8 +1049,10 @@ elif page == " Skrining Balita":
                 "sex": sex,
                 "weight": weight,
                 "height": height,
-                "hc": hc
+                "hc": hc,
+                "birth_date": birth_date
             }
+
 
             # Hitung Z-Scores
             waz_z = calc_wfa(data["age"], data["sex"], data["weight"])
