@@ -826,20 +826,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                         edit_hc = st.number_input("Lingkar Kepala (cm)", min_value=0.0, max_value=60.0, 
                                                  value=float(record[8]), step=0.1, format="%.1f")
                         
-                        # Handle tanggal_lahir (index 20 if logic holds, but let's check retrieval)
-                        # record comes from SELECT * FROM measurements. 
-                        # columns: 0:id, 1:tanggal, 2:nama, 3:usia, 4:gender, 5:alamat, 6:bb, 7:tb, 8:lk, ...
-                        # 19: created_by, 20: tanggal_lahir (newly added at end)
-                        
-                        # birth_date_val = None
-                        # if len(record) > 20 and record[20]:
-                        #     try:
-                        #         birth_date_val = pd.to_datetime(record[20]).date()
-                        #     except:
-                        #         birth_date_val = None
-                        
                         edit_birth_date = st.date_input("Tanggal Lahir", value=birth_date_val)
-
                     
                     col_submit, col_cancel = st.columns(2)
                     with col_submit:
@@ -1025,7 +1012,7 @@ elif page == " Skrining Balita":
                 input_age_val = age_val
         
         if birth_date:
-            st.info(f"Usia Terhitung: **{age_val} bulan**")
+            # st.info(f"Usia Terhitung: **{age_val} bulan**")
             age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=input_age_val)
         else:
             age = st.number_input("Usia (bulan)", min_value=0, max_value=60, step=1, value=0)
