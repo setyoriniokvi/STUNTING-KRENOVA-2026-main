@@ -301,54 +301,54 @@ def wfa_status(z):
     if z is None:
         return None
     elif z < -3 :
-        return "Berat Anak Sangat Kurang\nZ-Score normal -2 s/d +2"
+        return "Berat Anak Sangat Kurang\n(Z-Score normal -2 s/d +2)"
     elif z < -2:
-        return "Berat Anak Kurang\nZ-Score normal -2 s/d +2"
+        return "Berat Anak Kurang\n(Z-Score normal -2 s/d +2)"
     elif z > 3:
-        return "Anak Obesitas\nZ-Score normal -2 s/d +2"
+        return "Anak Obesitas\n(Z-Score normal -2 s/d +2)"
     elif z > 2:
-        return "Berat Badan Anak Berlebih\nZ-Score normal -2 s/d +2"
+        return "Berat Badan Anak Berlebih\n(Z-Score normal -2 s/d +2)"
     else:
-        return "Berat Badan Anak Normal\nZ-Score normal -2 s/d +2"
+        return "Berat Badan Anak Normal\n(Z-Score normal -2 s/d +2)"
 
 ### Tinggi/Usia
 def hfa_status(z):
     if z is None:
         return None
     elif z < -3:
-        return "Anak Sangat Pendek\nZ-Score normal -2 s/d +3"
+        return "Anak Sangat Pendek\n(Z-Score normal -2 s/d +3)"
     elif z < -2:
-        return "Anak Pendek\nZ-Score normal -2 s/d +3"
+        return "Anak Pendek\n(Z-Score normal -2 s/d +3)"
     elif z > 3:
-        return "Anak Tinggi\nZ-Score normal -2 s/d +3"
+        return "Anak Tinggi\n(Z-Score normal -2 s/d +3)"
     else:
-        return "Tinggi Anak Normal\nZ-Score normal -2 s/d +3"
+        return "Tinggi Anak Normal\n(Z-Score normal -2 s/d +3)"
 
 ### Berat/Tinggi
 def wfh_status(z):
     if z is None:
         return None
     elif z < -3:
-        return "Gizi Anak Buruk\nZ-Score normal -2 s/d +2"
+        return "Gizi Anak Buruk\n(Z-Score normal -2 s/d +2)"
     elif z < -2:
-        return "Gizi Anak Kurang\nZ-Score normal -2 s/d +2"
+        return "Gizi Anak Kurang\n(Z-Score normal -2 s/d +2)"
     elif z > 3:
-        return  "Anak Obesitas\nZ-Score normal -2 s/d +2"
+        return  "Anak Obesitas\n(Z-Score normal -2 s/d +2)"
     elif z > 2:
-        return "Anak Overweight\nZ-Score normal -2 s/d +2"
+        return "Anak Overweight\n(Z-Score normal -2 s/d +2)"
     else:
-        return "Gizi Anak Baik/Normal\nZ-Score normal -2 s/d +2"
+        return "Gizi Anak Baik/Normal\n(Z-Score normal -2 s/d +2)"
 
 ### Lingkar Kepala/Usia
 def hcaf_status(z):
     if z is None:
         return None
     elif z < -2:
-        return "Anak Terindikasi Microcephaly. Berisiko keterlambatan kognitif, motorik, dan belajar jangka panjang, serta gangguan neurologis\nZ-Score normal -2 s/d +2"
+        return "Anak Terindikasi Microcephaly. Berisiko keterlambatan kognitif, motorik, dan belajar jangka panjang, serta gangguan neurologis\n(Z-Score normal -2 s/d +2)"
     elif z > 2:
-        return "Anak Terindikasi Macrocephaly. Indikasi adanya hydrocephalus atau masalah genetik, memerlukan skrining dini\nZ-Score normal -2 s/d +2"
+        return "Anak Terindikasi Macrocephaly. Indikasi adanya hydrocephalus atau masalah genetik, memerlukan skrining dini\n(Z-Score normal -2 s/d +2)"
     else:
-        return "Lingkar Kepala Anak Normal\nZ-Score normal -2 s/d +2"
+        return "Lingkar Kepala Anak Normal\n(Z-Score normal -2 s/d +2)"
 
 ## ======= SAFE ROUND
 def safe_round(x):
