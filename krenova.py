@@ -988,7 +988,7 @@ elif page == " Skrining Balita":
         date = st.date_input("Tanggal Pengukuran", value=None)
         name = st.text_input("Nama Anak", placeholder="Masukkan nama lengkap anak")
         # alamat = st.text_input("Alamat/Desa", placeholder="Contoh: Desa Slogo, Kec. Tanon")
-        alamat = st.selectbox("Alamat", ["Karangasem", "Bentak", "Gonggangan", "Sukolelo", "Pijinan"])
+        alamat = st.selectbox("Alamat Dukuh", ["Karangasem", "Bentak", "Gonggangan", "Sukolelo", "Pijinan"])
         
         birth_date = st.date_input("Tanggal Lahir Anak", value=None)
         
