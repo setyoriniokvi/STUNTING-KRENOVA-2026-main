@@ -715,36 +715,69 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         
         with col2:
             # Bar Chart - Perbandingan
-            total_anak = len(df)
-            berisiko = len(df[df['status_stunting'] != 'Tidak Berisiko Stunting'])
-            tidak_berisiko = total_anak - berisiko
+        #     total_anak = len(df)
+        #     berisiko = len(df[df['status_stunting'] != 'Tidak Berisiko Stunting'])
+        #     tidak_berisiko = total_anak - berisiko
             
-            persentase_berisiko = (berisiko / total_anak * 100) if total_anak > 0 else 0
-            persentase_tidak_berisiko = (tidak_berisiko / total_anak * 100) if total_anak > 0 else 0
+        #     persentase_berisiko = (berisiko / total_anak * 100) if total_anak > 0 else 0
+        #     persentase_tidak_berisiko = (tidak_berisiko / total_anak * 100) if total_anak > 0 else 0
             
-            fig_bar = go.Figure(data=[
-                go.Bar(
-                    x=['Tidak Berisiko', 'Berisiko Stunting'],
-                    y=[tidak_berisiko, berisiko],
-                    text=[f'{tidak_berisiko}<br>({persentase_tidak_berisiko:.1f}%)', 
-                          f'{berisiko}<br>({persentase_berisiko:.1f}%)'],
-                    textposition='auto',
-                    marker=dict(color=['#8AA624', '#FEA405'])
+        #     fig_bar = go.Figure(data=[
+        #         go.Bar(
+        #             x=['Tidak Berisiko', 'Berisiko Stunting'],
+        #             y=[tidak_berisiko, berisiko],
+        #             text=[f'{tidak_berisiko}<br>({persentase_tidak_berisiko:.1f}%)', 
+        #                   f'{berisiko}<br>({persentase_berisiko:.1f}%)'],
+        #             textposition='auto',
+        #             marker=dict(color=['#8AA624', '#FEA405'])
+        #         )
+        #     ])
+            
+        #     fig_bar.update_layout(
+        #         title="Perbandingan Risiko Stunting",
+        #         xaxis_title="Status",
+        #         yaxis_title="Jumlah Anak",
+        #         showlegend=False,
+        #         height=400
+        #     )
+            
+        #     st.plotly_chart(fig_bar, use_container_width=True)
+        
+        # st.markdown("---")
+        
+            if 'alamat' in df.columns:
+                # Hitung statistik per alamat
+                alamat_stats = df.groupby('alamat').agg(
+                    total_anak=('id', 'count'),
+                    berisiko_stunting=('status_stunting', lambda x: (x != 'Tidak Berisiko Stunting').sum())
+                ).reset_index()
+
+                alamat_stats['persentase'] = (
+                    alamat_stats['berisiko_stunting'] / alamat_stats['total_anak'] * 100
+                ).round(1)
+
+                # Bar Chart
+                fig_bar = go.Figure(data=[
+                    go.Bar(
+                        x=alamat_stats['alamat'],
+                        y=alamat_stats['berisiko_stunting'],
+                        text=alamat_stats['persentase'].astype(str) + '%',
+                        textposition='auto',
+                        marker=dict(color='#FEA405')
+                    )
+                ])
+
+                fig_bar.update_layout(
+                    title="Perbandingan Risiko Stunting per Dukuh",
+                    xaxis_title="Alamat",
+                    yaxis_title="Jumlah Anak Berisiko Stunting",
+                    height=400
                 )
-            ])
-            
-            fig_bar.update_layout(
-                title="Perbandingan Risiko Stunting",
-                xaxis_title="Status",
-                yaxis_title="Jumlah Anak",
-                showlegend=False,
-                height=400
-            )
-            
-            st.plotly_chart(fig_bar, use_container_width=True)
-        
-        st.markdown("---")
-        
+
+                st.plotly_chart(fig_bar, use_container_width=True)
+            else:
+                st.info("Kolom 'alamat' tidak ditemukan dalam data.")
+                
         # Statistik per Daerah
         st.subheader(" Statistik Risiko Stunting per Daerah")
         if 'alamat' in df.columns:
