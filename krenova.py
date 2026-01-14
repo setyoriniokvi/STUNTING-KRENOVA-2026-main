@@ -1203,16 +1203,16 @@ elif page == " Profile":
                 padding: 2rem; border-radius: 15px; border-left: 5px solid #8AA624;'>
         <p style='font-size: 1.1rem; line-height: 1.8; text-align: justify;'>
             <strong>SI Tumbuh</strong> merupakan sistem informasi berbasis web yang dikembangkan untuk mendukung skrining 
-            pertumbuhan balita dan penilaian status gizi anak di tingkat layanan kesehatan dasar. Sistem ini menggunakan 
+            pertumbuhan dan penilaian status gizi balita di tingkat layanan posyandu. Sistem ini menggunakan 
             data antropometri balita meliputi berat badan, tinggi/panjang badan, usia, dan jenis kelamin untuk menghitung 
             indikator pertumbuhan (BB/U, TB/U, BB/TB, dan LK/U) berdasarkan standar WHO, sehingga dapat mengidentifikasi 
-            gangguan pertumbuhan dan risiko stunting secara dini.
+            gangguan pertumbuhan dan risiko stunting.
         </p>
         <p style='font-size: 1.1rem; line-height: 1.8; text-align: justify;'>
-            Sebagai alat bantu skrining, SI Tumbuh menyajikan hasil pengukuran dalam bentuk visualisasi yang mudah dipahami, 
-            disertai interpretasi status gizi dan rekomendasi tindak lanjut awal yang ditujukan untuk mendukung peran kader 
-            Posyandu dan tenaga kesehatan. Sistem ini dirancang untuk memperkuat pemantauan pertumbuhan balita, deteksi dini 
-            masalah gizi, serta upaya promotif dan preventif dalam peningkatan kesehatan dan gizi anak.
+            SI Tumbuh menyajikan hasil pengukuran dalam bentuk visualisasi yang mudah dipahami, disertai interpretasi
+            status gizi dan rekomendasi tindak lanjut awal yang ditujukan untuk mendukung peran kader Posyandu. 
+            Sistem ini dirancang untuk memperkuat pemantauan pertumbuhan balita, deteksi dini masalah gizi, serta upaya
+            promotif dan preventif dalam peningkatan kesehatan dan status gizi balita.
         </p>
     </div>
     """, unsafe_allow_html=True)
