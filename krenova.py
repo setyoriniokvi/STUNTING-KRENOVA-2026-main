@@ -845,7 +845,8 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                     with col1:
                         edit_date = st.date_input("Tanggal Pengukuran", value=pd.to_datetime(record[1]).date())
                         edit_name = st.text_input("Nama Anak", value=record[2])
-                        edit_alamat = st.text_input("Alamat/Desa", value=record[5])
+                        # edit_alamat = st.text_input("Alamat/Desa", value=record[5])
+                        edit_alamat = st.selectbox("Alamat Dukuh", ["Karangasem", "Bentak", "Gonggangan", "Sukolelo", "Pijinan"])
                         edit_age = st.number_input("Usia (bulan)", min_value=0, max_value=60, value=record[3])
                         edit_sex = st.selectbox("Jenis Kelamin", ["L", "P"], 
                                               index=0 if record[4] == "L" else 1,
