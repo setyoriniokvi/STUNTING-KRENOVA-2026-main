@@ -47,6 +47,39 @@ Berikan analisis mendalam berdasarkan data:
 
             Sajikan dalam bentuk tabel agar mudah dibaca dan ringkas.
 
+            Ketentuan tabel:
+            - Tabel HARUS memiliki 4 kolom dan 4 baris (1 header + 3 indikator)
+            - Gunakan format tabel Markdown
+            - Jangan menambahkan narasi di luar tabel
+
+            Struktur tabel WAJIB sebagai berikut:
+
+            Kolom:
+            1. Indikator
+            2. Kondisi Saat Ini (Usia {age} bulan)
+            3. Target Normal (Median WHO) Usia {age} bulan
+            4. Target Normal (Median WHO) Usia {age bulan depan} bulan (Bulan Depan)
+
+            Baris indikator:
+            - Berat Badan (BB)
+            - Tinggi Badan (TB)
+            - Lingkar Kepala (LK)
+
+            Aturan pengisian:
+            - Kolom "Kondisi Saat Ini" diisi dengan keterangan kondisi dalam 1-3 kata
+            - Kolom "Target Normal" diisi nilai median WHO sesuai usia
+            - Gunakan satuan yang sesuai:
+            - BB dalam kg
+            - TB dalam cm
+            - LK dalam cm
+            - Jika data tidak tersedia, tuliskan "—"
+
+            Tabel harus:
+            - Mudah dipahami kader Posyandu dan orang tua
+            - Tidak menggunakan istilah teknis berlebihan
+            - Tidak memberikan interpretasi atau diagnosis
+
+
     2. Interpretasi Risiko
     (jelaskan apakah anak perlu pemantauan rutin, perhatian khusus, atau rujukan)
     Format yang dimunculkan mencakup:
