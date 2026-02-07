@@ -45,6 +45,8 @@ Berikan analisis mendalam berdasarkan data:
            - Kondisi normal anak seharusnya saat pengukuran berlangsung
            - Kondisi Normal anak (TB, BB, Lingkar Kepala) satu bulan depan untuk diberikan sebaga acuan perbaikan kondisi tubuh dan gizi anak
 
+            Sajikan dalam bentuk tabel agar mudah dibaca dan ringkas.
+
     2. Interpretasi Risiko
     (jelaskan apakah anak perlu pemantauan rutin, perhatian khusus, atau rujukan)
     Format yang dimunculkan mencakup:
