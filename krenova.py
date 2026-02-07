@@ -15,51 +15,27 @@ except Exception as e:
     client = None
 
 ### ======= FUNGSI ANALISIS AI
-def get_ai_analysis(data_anak, status_z):
-    prompt = f"""
-    Anda adalah Pakar Gizi Anak (Pediatrician) Berstandar WHO. Berikan analisis mendalam berdasarkan data:
-    - Nama: {data_anak['name']}
-    - Usia: {data_anak['age']} bulan ({data_anak['sex']})
-    - Skor Weight for Age: {status_z['waz_z']} ({status_z['waz_label']})
-    - Skor Height for Age: {status_z['haz_z']} ({status_z['haz_label']})
-    - Skor Weight for Height: {status_z['whz_z']} ({status_z['whz_label']})
-    - Skor Head Circum for Age: {status_z['hcz_z']} ({status_z['hcz_label']})
+def load_prompt(path='prompt.txt'):
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
     
-        Anda adalah asisten pendukung skrining pertumbuhan anak di tingkat Posyandu.
-    Peran Anda terbatas pada interpretasi hasil skrining antropometri berdasarkan standar WHO
-    dan pemberian saran tindak lanjut awal yang bersifat edukatif dan non-medis.
+def get_ai_analysis(data_anak, status_z):
+    template = load_prompt()
 
-    Anda bukan tenaga kesehatan dan tidak melakukan diagnosis stunting atau penyakit.
-    Anda tidak memberikan rekomendasi pengobatan atau terapi medis
-    Batasan tugas Anda:
-    - Hanya menjelaskan makna hasil skrining pertumbuhan anak
-    - Memberikan saran tindak lanjut awal yang bersifat umum dan non-medis
-    - Mengarahkan kader untuk merujuk ke tenaga kesehatan bila ditemukan risiko
-
-    Dilarang:
-    - Menyatakan diagnosis stunting atau penyakit
-    - Memberikan rekomendasi pengobatan, suplemen, atau terapi medis
-    - Menggantikan peran tenaga kesehatan profesional
-    Menyusun interpretasi hasil skrining secara ringkas, jelas, dan mudah dipahami kader
-    2. Menjelaskan arti kombinasi indikator antropometri tersebut terhadap risiko pertumbuhan anak
-    3. Menyampaikan hasil dalam bahasa non-teknis dan tidak menakutkan
-    4. Menyusun saran tindak lanjut awal yang dapat dilakukan kader Posyandu
-    format keluaran WAJIB sebagai berikut:
-
-    1. Ringkasan Hasil Skrining
-    (jelaskan kondisi pertumbuhan anak secara umum)
-
-    2. Interpretasi Risiko
-    (jelaskan apakah anak perlu pemantauan rutin, perhatian khusus, atau rujukan)
-
-    3. Saran Tindak Lanjut Awal untuk Kader
-    (berupa langkah umum seperti pemantauan ulang, edukasi orang tua, rujukan)
-
-    4. Catatan Penting
-    (tegaskan bahwa hasil ini bukan diagnosis dan perlu konfirmasi tenaga kesehatan)
-
-    5. Tambahan: Gunakan bahasa yang mudah dipahami oleh ibu-ibu posyandu dan orang tua, karena di desa tidak semua memiliki akses ke pendidikan tinggi. Tidak menakut-nakuti dan tetap ramah.
-"""
+    prompt = template.format(
+        name=data_anak["name"],
+        age=data_anak["age"],
+        sex=data_anak["sex"],
+        waz_z=status_z["waz_z"],
+        waz_label=status_z["waz_label"],
+        haz_z=status_z["haz_z"],
+        haz_label=status_z["haz_label"],
+        whz_z=status_z["whz_z"],
+        whz_label=status_z["whz_label"],
+        hcz_z=status_z["hcz_z"],
+        hcz_label=status_z["hcz_label"],
+    )
+    
     try:
         response = client.models.generate_content(
             model="gemini-3-flash-preview",
