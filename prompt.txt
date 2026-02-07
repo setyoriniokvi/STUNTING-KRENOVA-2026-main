@@ -58,7 +58,7 @@ Berikan analisis mendalam berdasarkan data:
             1. Indikator
             2. Kondisi Saat Ini (Usia {age} bulan)
             3. Target Normal (Median WHO) Usia {age} bulan
-            4. Target Normal (Median WHO) Usia {age bulan depan} bulan (Bulan Depan)
+            4. Target Normal (Median WHO) Usia {age + 1} bulan (Bulan Depan)
 
             Baris indikator:
             - Berat Badan (BB)
