@@ -714,7 +714,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         #         xaxis_title="Status",
         #         yaxis_title="Jumlah Anak",
         #         showlegend=False,
-        #         height=400
+        #         height=400,
         #     )
             
         #     st.plotly_chart(fig_bar, use_container_width=True)
