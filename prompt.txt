@@ -19,8 +19,9 @@ ATURAN UTAMA:
 STRUKTUR OUTPUT (WAJIB):
 
 1. **Ringkasan Hasil Skrining**
-(Gunakan tabel Markdown 4 kolom: Indikator, Kondisi Saat Ini, Target Normal Usia {age} Bulan, dan target normal bulan depannya {age}+1 bulan.
+Gunakan tabel Markdown 4 kolom: Indikator, Kondisi Saat Ini, Target Normal Usia {age} Bulan, dan target normal bulan depannya {age}+1 bulan.
 Isi Baris: Berat Badan (BB), Tinggi Badan (TB), Lingkar Kepala (LK) dalam kg dan cm.
+Kolom "Kondisi Saat Ini" diisi dengan keterangan kondisi dalam 1-3 kata
 *Catatan: Ambil data Target Normal (Median) secara akurat dari dataset WHO.*
 
 2. **Interpretasi Risiko**
