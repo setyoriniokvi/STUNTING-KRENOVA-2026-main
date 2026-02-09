@@ -717,7 +717,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         #         height=400,
         #     )
             
-        #     st.plotly_chart(fig_bar, use_container_width=True)
+        #     st.plotly_chart(fig_bar, use_container_width=True),
         
         # st.markdown("---")
         
