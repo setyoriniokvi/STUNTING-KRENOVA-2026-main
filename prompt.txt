@@ -78,4 +78,4 @@ Berikan analisis mendalam berdasarkan data:
         a. INGAT! SISTEM INI HANYA ASISTEN INTERPRETATIF yang tidak mendiagnosis.
         b. Gunakan perpaduan Bullet poin, spasi antar section kalimat, dan bold text agar hasil interpretasi mudah dibaca
 
-    5. Batasi Output sekitar 5000 karakter untuk menghindari pemborosan token API
+    5. Batasi Output sekitar 2000 karakter untuk menghindari pemborosan token API
