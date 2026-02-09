@@ -38,7 +38,7 @@ def get_ai_analysis(data_anak, status_z):
     
     try:
         response = client.models.generate_content(
-            model="gemini-3-flash-preview",
+            model="gemini-2.5-flash",
             contents=prompt
         )
         return response.text
