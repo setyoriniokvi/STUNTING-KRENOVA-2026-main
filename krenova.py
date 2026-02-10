@@ -11,7 +11,8 @@ from google import genai
 try:
     client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 except Exception as e:
-    st.error(f"Konfigurasi AI gagal: {e}")
+    st.error(f"Opps Konfigurasi AI gagal: {e}")
+    st.error(f"Silahkan lakukan pendampingan hasil screening dengan pihak medis atau bidan")
     client = None
 
 ### ======= FUNGSI ANALISIS AI
