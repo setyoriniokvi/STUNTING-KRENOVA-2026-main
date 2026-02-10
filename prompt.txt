@@ -1,5 +1,4 @@
 Berikan analisis mendalam berdasarkan data:
-    - Nama: {name}
     - Usia: {age} bulan ({sex})
     - Skor Weight for Age: {waz_z} ({waz_label})
     - Skor Height for Age: {haz_z} ({haz_label})
