@@ -643,7 +643,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
     
     if not df.empty:
         # Statistik
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("Total Pengukuran", len(df))
         with col2:
@@ -652,9 +652,9 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         with col3:
             avg_age = df['usia_bulan'].mean()
             st.metric("Rata-rata Usia", f"{avg_age:.1f} bulan")
-        with col4:
-            avg_risk = df['risiko_stunting_persen'].mean()
-            st.metric("Rata-rata Z-Score TB", f"{avg_risk:.1f}%")
+        # with col4:
+        #     avg_risk = df['risiko_stunting_persen'].mean()
+        #     st.metric("Rata-rata Z-Score TB", f"{avg_risk:.1f}%")
         
         st.markdown("---")
         
@@ -736,7 +736,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
             }).rename(columns={
                 'id': 'Total Anak',
                 'status_stunting': 'Berisiko Stunting',
-                'risiko_stunting_persen': 'Rata-rata Risiko'
+                'risiko_stunting_persen': 'Rata-rata Z-Score TB'
             }).sort_values('Berisiko Stunting', ascending=False)
             
             alamat_stats['Persentase Risiko'] = (alamat_stats['Berisiko Stunting'] / alamat_stats['Total Anak'] * 100).round(1)
