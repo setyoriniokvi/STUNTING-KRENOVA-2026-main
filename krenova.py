@@ -654,7 +654,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
             st.metric("Rata-rata Usia", f"{avg_age:.1f} bulan")
         with col4:
             avg_risk = df['risiko_stunting_persen'].mean()
-            st.metric("Rata-rata Risiko", f"{avg_risk:.1f}%")
+            st.metric("Rata-rata Z-Score TB", f"{avg_risk:.1f}%")
         
         st.markdown("---")
         
