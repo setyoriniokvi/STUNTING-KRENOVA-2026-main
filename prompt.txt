@@ -59,7 +59,7 @@ Berikan analisis mendalam berdasarkan data:
 
             Aturan pengisian:
             - Kolom "Kondisi Saat Ini" diisi dengan keterangan kondisi dalam 1-3 kata
-            - Kolom "Target Normal" diisi nilai median WHO sesuai usia
+            - Kolom "Target Normal" bulan ini dan bulan depan diisi nilai median WHO sesuai usia (selalu angka)
             - Gunakan satuan yang sesuai (kg dan cm):
             - Jika data tidak tersedia, tuliskan "—"
 
