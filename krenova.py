@@ -862,21 +862,6 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                 
                 st.markdown("---")
         
-        # Konfirmasi Delete
-        if st.session_state.delete_confirm_id is not None:
-            st.warning(" Apakah Anda yakin ingin menghapus data ini?")
-            col1, col2, col3 = st.columns([1, 1, 2])
-            with col1:
-                if st.button(" Ya, Hapus", use_container_width=True):
-                    delete_measurement(st.session_state.delete_confirm_id)
-                    st.success(" Data berhasil dihapus!")
-                    st.session_state.delete_confirm_id = None
-                    st.rerun()
-            with col2:
-                if st.button(" Batal", use_container_width=True):
-                    st.session_state.delete_confirm_id = None
-                    st.rerun()
-            st.markdown("---")
         
         # Display table
 
@@ -910,7 +895,22 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         display_df.columns = display_names
         
         st.dataframe(display_df, use_container_width=True, height=400)
+        st.markdown("---")
         
+        # Konfirmasi Delete ====================================================
+        if st.session_state.delete_confirm_id is not None:
+            st.warning(" Apakah Anda yakin ingin menghapus data ini?")
+            col1, col2, col3 = st.columns([1, 1, 2])
+            with col1:
+                if st.button(" Ya, Hapus", use_container_width=True):
+                    delete_measurement(st.session_state.delete_confirm_id)
+                    st.success(" Data berhasil dihapus!")
+                    st.session_state.delete_confirm_id = None
+                    st.rerun()
+            with col2:
+                if st.button(" Batal", use_container_width=True):
+                    st.session_state.delete_confirm_id = None
+                    st.rerun()
         st.markdown("---")
         
         # Aksi Edit dan Delete dengan input ID
