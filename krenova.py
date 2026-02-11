@@ -736,7 +736,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
             }).rename(columns={
                 'id': 'Total Anak',
                 'status_stunting': 'Berisiko Stunting',
-                'risiko_stunting_persen': 'Rata-rata Risiko (%)'
+                'risiko_stunting_persen': 'Rata-rata Risiko'
             }).sort_values('Berisiko Stunting', ascending=False)
             
             alamat_stats['Persentase Risiko'] = (alamat_stats['Berisiko Stunting'] / alamat_stats['Total Anak'] * 100).round(1)
