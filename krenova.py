@@ -888,7 +888,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
         display_names.extend([
             'BB (kg)', 'TB (cm)', 'LK (cm)',
             'WFA Z', 'HFA Z', 'WFH Z', 'HCFA Z',
-            'Risiko %', 'Status', 'Oleh'
+            'Z-Score TB', 'Status', 'Oleh'
         ])
         
         display_df = filtered_df[display_cols].copy()
