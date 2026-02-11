@@ -46,6 +46,7 @@ def get_ai_analysis(data_anak, status_z):
     except Exception as e:
         return f"Oops. Gagal mendapatkan saran Gemini: {str(e)}"
 
+
 # ========= DATABASE SETUP
 def init_database():
     conn = sqlite3.connect('krenova_data.db')
@@ -314,7 +315,7 @@ def wfh_status(z):
     elif z > 2:
         return "Anak Overweight\n(Z-Score normal -2 s/d +2)"
     else:
-        return "Gizi Anak Baik/Normal\n(Z-Score normal -2 s/d +2)"
+        return "Gizi Anak Baik/Normal\n(Z-Score normal -2 s/d +2) "
 
 ### Lingkar Kepala/Usia
 def hcaf_status(z):
@@ -332,14 +333,15 @@ def safe_round(x):
     return round(x, 2) if x is not None else None
 
 ## ======= RISK STUNTING (%)
-def stunting_risk_percent(hfa, wfa):
-    score = 0
+def stunting_risk(hfa):
+    # score = 0
 
-    if hfa < -2:
-        score += 60
-    if wfa < -2:
-        score += 40
-    return min(score, 100)
+    # if hfa < -2:
+    #     score += 60
+    # if wfa < -2:
+    #     score += 40
+    # return min(score, 100)
+    return hfa
 
 
 ## ========= STREAMLIT
@@ -691,37 +693,6 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
             st.plotly_chart(fig_pie, use_container_width=True)
         
         with col2:
-            # Bar Chart - Perbandingan
-        #     total_anak = len(df)
-        #     berisiko = len(df[df['status_stunting'] != 'Tidak Berisiko Stunting'])
-        #     tidak_berisiko = total_anak - berisiko
-            
-        #     persentase_berisiko = (berisiko / total_anak * 100) if total_anak > 0 else 0
-        #     persentase_tidak_berisiko = (tidak_berisiko / total_anak * 100) if total_anak > 0 else 0
-            
-        #     fig_bar = go.Figure(data=[
-        #         go.Bar(
-        #             x=['Tidak Berisiko', 'Berisiko Stunting'],
-        #             y=[tidak_berisiko, berisiko],
-        #             text=[f'{tidak_berisiko}<br>({persentase_tidak_berisiko:.1f}%)', 
-        #                   f'{berisiko}<br>({persentase_berisiko:.1f}%)'],
-        #             textposition='auto',
-        #             marker=dict(color=['#8AA624', '#FEA405'])
-        #         )
-        #     ])
-            
-        #     fig_bar.update_layout(
-        #         title="Perbandingan Risiko Stunting",
-        #         xaxis_title="Status",
-        #         yaxis_title="Jumlah Anak",
-        #         showlegend=False,
-        #         height=400,
-        #     )
-            
-        #     st.plotly_chart(fig_bar, use_container_width=True),
-        
-        # st.markdown("---")
-        
             if 'alamat' in df.columns:
                 # Hitung statistik per alamat
                 alamat_stats = df.groupby('alamat').agg(
@@ -869,7 +840,7 @@ if page == " Database (Admin)" and st.session_state.view_mode == 'admin' and st.
                         hcz_z = calc_hcfa(edit_data["age"], edit_data["sex"], edit_data["hc"])
                         hcz_label = hcaf_status(hcz_z)
                         
-                        risk = stunting_risk_percent(haz_z, waz_z) if haz_z and waz_z else None
+                        risk = stunting_risk(safe_round(haz_z)) if haz_z else None
                         status = stunting_status(haz_z) if haz_z else None
                         
                         WFA = safe_round(waz_z)
@@ -1071,7 +1042,7 @@ elif page == " Skrining Balita":
             hcz_z = calc_hcfa(data["age"], data["sex"], data["hc"])
             hcz_label = hcaf_status(hcz_z)
 
-            risk = stunting_risk_percent(haz_z, waz_z) if haz_z and waz_z else None
+            risk = stunting_risk(safe_round(haz_z)) if haz_z else None
             status = stunting_status(haz_z) if haz_z else None
 
             WFA = safe_round(waz_z)
@@ -1147,8 +1118,8 @@ elif page == " Skrining Balita":
             with col1:
                 st.markdown(f"""
                 <div style='text-align: center; padding: 2rem; background: linear-gradient(135deg, #8AA624 0%, #FEA405 100%); border-radius: 15px; color: white;'>
-                    <h1 style='margin: 0; font-size: 3rem;'>{risk}%</h1>
-                    <p style='margin: 0; font-size: 1.2rem;'>Risiko Stunting</p>
+                    <p style='margin: 0; font-size: 1.2rem;'>Z-Score Tinggi Badan</p>
+                    <h1 style='margin: 0; font-size: 3rem;'>{risk}</h1>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -1157,6 +1128,16 @@ elif page == " Skrining Balita":
                     st.error(f" **Status Stunting:** {status}")
                 else:
                     st.success(f" **Status Stunting:** {status}")
+
+            # # Interpretasi Stunting
+            # st.subheader("Interpretasi Risiko Stunting")
+
+            # st.markdown(f"""
+            #     <div style='text-align: center; padding: 2rem; background: linear-gradient(135deg, #8AA624 0%, #FEA405 100%); border-radius: 15px; color: white;'>
+            #         <p style='margin: 0; font-size: 1.2rem;'>Z-Score Tinggi Badan</p>
+            #         <h1 style='margin: 0; font-size: 3rem;'>{risk}</h1>
+            #     </div>
+            #     """, unsafe_allow_html=True)
             
             st.markdown("---")
             st.caption(" Hasil ini merupakan skrining awal. Untuk diagnosis dan penanganan lebih lanjut, konsultasikan dengan tenaga kesehatan profesional.")
